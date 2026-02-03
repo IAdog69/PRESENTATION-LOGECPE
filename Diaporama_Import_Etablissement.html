@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diaporama - Import Établissement | LOGECPE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #2196F3;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 8px rgba(33, 150, 243, 0.5);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #aaa;
+        }
+
+        .controls-info {
+            margin-top: 15px;
+            padding: 12px 25px;
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            display: inline-block;
+        }
+
+        .animation-container {
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            min-height: 600px;
+        }
+
+        /* Étapes */
+        .step {
+            display: none;
+            opacity: 0;
+        }
+
+        .step.active {
+            display: block;
+            animation: slideInFromRight 0.6s ease forwards;
+        }
+
+        .step.exiting {
+            animation: slideOutToLeft 0.6s ease forwards;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            color: #2196F3;
+            font-weight: 600;
+        }
+
+        .step-content {
+            background: rgba(33, 150, 243, 0.1);
+            border-left: 4px solid #2196F3;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        /* Interface mock */
+        .interface-mock {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid #444;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .toolbar-mock {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .button-mock {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .button-mock:hover {
+            transform: translateY(-3px);
+        }
+
+        .button-mock.primary {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
+        .table-mock {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: rgba(33, 150, 243, 0.3);
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr) 100px;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .table-row {
+            padding: 12px 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr) 100px;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .stats-mock {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .overlay-demo {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 40px;
+            margin-top: 20px;
+            border: 3px solid #2196F3;
+        }
+
+        .close-x {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(33, 150, 243, 0.2));
+            border: 2px solid #4CAF50;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Navigation */
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50px;
+        }
+
+        .dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .dot:hover {
+            transform: scale(1.3);
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .dot.active {
+            background: #2196F3;
+            box-shadow: 0 0 20px rgba(33, 150, 243, 0.8);
+            transform: scale(1.4);
+        }
+
+        .dot::after {
+            content: attr(data-step);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #aaa;
+            white-space: nowrap;
+        }
+
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(33, 150, 243, 0.3);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-arrow:hover {
+            background: rgba(33, 150, 243, 0.8);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-arrow.prev {
+            left: 20px;
+        }
+
+        .nav-arrow.next {
+            right: 20px;
+        }
+
+        .step-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(33, 150, 243, 0.3);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .timer-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2196F3, #4CAF50);
+            width: 0%;
+            transition: width 0.1s linear;
+            z-index: 1001;
+            box-shadow: 0 2px 10px rgba(33, 150, 243, 0.5);
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-button {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.5);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .control-button:hover {
+            transform: translateY(-3px);
+        }
+
+        .control-button.pause {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
+        .control-button.play {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutToLeft {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-100px);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="timer-bar" id="timerBar"></div>
+    <div class="step-counter" id="stepCounter">Étape 1 / 7</div>
+    
+    <div class="nav-arrow prev" onclick="previousStep()">◀</div>
+    <div class="nav-arrow next" onclick="nextStep()">▶</div>
+
+    <div class="header">
+        <h1>🎬 Diaporama - Module Import Établissement</h1>
+        <p>Découvrez le workflow complet en 7 étapes</p>
+        <div class="controls-info">
+            🖱️ Clic droit ou ▶ pour avancer | ◀ pour reculer | Auto-défilement : 10 secondes/étape
+        </div>
+    </div>
+
+    <div class="animation-container">
+        
+        <!-- ÉTAPE 0 - PRÉSENTATION LOGECPE -->
+        <!-- ÉTAPE 1 -->
+        <div class="step" id="step1">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">Cliquer sur "Import Établissement"</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px; font-size: 1.05rem;">Dans la barre de contrôles de LOGECPE, repérez le bouton vert :</p>
+                
+                <div style="background: #252525; padding: 20px; border-radius: 8px; border: 1px solid #333; margin-bottom: 25px;">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center;">
+                        <button class="button-mock" style="background: #00cc00; color: black; font-size: 0.95rem; padding: 12px 24px; font-weight: bold; box-shadow: 0 0 20px rgba(0, 204, 0, 0.5); animation: pulse 2s infinite;">
+                            📥 Import Établissement
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(0, 204, 0, 0.1); border-left: 4px solid #00cc00; padding: 20px; border-radius: 5px;">
+                    <p style="font-size: 1rem; line-height: 1.8; margin: 0;">
+                        ✅ <strong>Après le clic :</strong> Un overlay en plein écran s'affiche avec le module d'import<br>
+                        ⏱️ <strong>Temps :</strong> Ouverture instantanée<br>
+                        🎯 <strong>Emplacement :</strong> Premier bouton de la barre d'outils, en vert vif
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 2 -->
+        <div class="step" id="step2">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title">Le Module s'Ouvre - Interface Complète</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px; text-align: center; font-size: 1.1rem;">Voici l'interface du <strong style="color: #FFA500;">Module Import</strong> qui s'affiche :</p>
+                
+                <div style="background: rgba(0, 0, 0, 0.95); border-radius: 10px; overflow: hidden; border: 2px solid #FFA500; box-shadow: 0 0 30px rgba(255, 165, 0, 0.3);">
+                    <!-- En-tête du module -->
+                    <div style="position: relative; background: #222; padding: 25px; border-bottom: 2px solid #FFA500;">
+                        <div style="position: absolute; top: 15px; right: 15px; background: #f44336; color: white; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">✖</div>
+                        <h3 style="color: #FFA500; text-align: center; margin: 0; font-size: 2rem; text-shadow: 0 0 10px rgba(255, 165, 0, 0.5);">📋 Import - Créateur de fichier établissement</h3>
+                        <p style="color: #aaa; text-align: center; margin: 10px 0 0 0; font-size: 1rem;">Créez et gérez facilement vos fichiers d'importation pour LOGECPE</p>
+                    </div>
+                    
+                    <!-- Statistiques -->
+                    <div style="padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; text-align: center;">
+                            <div style="font-size: 2.5rem; color: #FFA500; font-weight: bold;">0</div>
+                            <div style="color: #aaa; margin-top: 5px;">Élèves</div>
+                        </div>
+                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; text-align: center;">
+                            <div style="font-size: 2.5rem; color: #FFA500; font-weight: bold;">0</div>
+                            <div style="color: #aaa; margin-top: 5px;">Classes</div>
+                        </div>
+                        <div style="background: #222; padding: 20px; border-radius: 8px; border: 1px solid #444; text-align: center;">
+                            <div style="font-size: 2.5rem; color: #FFA500; font-weight: bold;">-</div>
+                            <div style="color: #aaa; margin-top: 5px;">Dernière sauvegarde</div>
+                        </div>
+                    </div>
+
+                    <!-- Barre d'outils -->
+                    <div style="background: #222; padding: 20px; margin: 0 20px; border-radius: 10px; border: 1px solid #444; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="button-mock" style="background: #FFA500; color: #000; font-size: 0.9rem; padding: 10px 16px; font-weight: bold;">➕ Ajouter un élève</button>
+                        <button class="button-mock" style="background: #4CAF50; color: #fff; font-size: 0.9rem; padding: 10px 16px; font-weight: bold;">💾 Charger dans LOGECPE</button>
+                        <button class="button-mock" style="background: #2196F3; color: #fff; font-size: 0.9rem; padding: 10px 16px; font-weight: bold;">📂 Importer CSV/XLSX</button>
+                        <button class="button-mock" style="background: #FF9800; color: #fff; font-size: 0.9rem; padding: 10px 16px; font-weight: bold;">📋 RPP</button>
+                        <button class="button-mock" style="background: #607D8B; color: #fff; font-size: 0.9rem; padding: 10px 16px; font-weight: bold;">🎲 Exemple</button>
+                        <button class="button-mock" style="background: #f44336; color: #fff; font-size: 0.9rem; padding: 10px 16px; font-weight: bold;">🗑️ Effacer</button>
+                    </div>
+
+                    <!-- Tableau -->
+                    <div style="background: #222; margin: 20px; border-radius: 10px; border: 1px solid #444; overflow: hidden;">
+                        <div style="background: rgba(255, 165, 0, 0.2); padding: 15px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; border-bottom: 2px solid #FFA500;">
+                            <div style="color: #FFA500; font-weight: bold;">Nom</div>
+                            <div style="color: #FFA500; font-weight: bold;">Prénom</div>
+                            <div style="color: #FFA500; font-weight: bold;">Classe</div>
+                            <div style="color: #FFA500; font-weight: bold;">Sexe</div>
+                            <div style="color: #FFA500; font-weight: bold;">Actions</div>
+                        </div>
+                        <div style="text-align: center; padding: 60px 20px; color: #aaa;">
+                            <h4 style="font-size: 1.3rem; margin-bottom: 10px;">Aucun élève</h4>
+                            <p style="font-size: 0.9rem;">Commencez par ajouter un élève ou importez un fichier</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 25px; background: rgba(255, 165, 0, 0.1); border-left: 4px solid #FFA500; padding: 20px; border-radius: 5px;">
+                    <p style="font-size: 1rem; line-height: 1.8; margin: 0;">
+                        ✅ <strong>3 zones principales :</strong><br>
+                        📊 Statistiques en haut (élèves, classes, dernière sauvegarde)<br>
+                        🛠️ Barre d'outils avec 6 boutons d'action<br>
+                        📋 Tableau avec colonnes : Nom, Prénom, Classe, Sexe, Actions
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3 -->
+        <div class="step" id="step3">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title">Choisir une Méthode d'Import</div>
+            </div>
+            <div class="step-content">
+                <h4 style="color: #FFA500; margin-bottom: 20px; text-align: center; font-size: 1.3rem;">4 méthodes disponibles :</h4>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div style="background: rgba(255, 165, 0, 0.1); border: 2px solid #FFA500; padding: 20px; border-radius: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <button class="button-mock" style="background: #FFA500; color: #000; font-size: 0.85rem; padding: 8px 12px;">➕</button>
+                            <h5 style="color: #FFA500; margin: 0; font-size: 1.1rem;">Ajouter un élève</h5>
+                        </div>
+                        <p style="font-size: 0.9rem; line-height: 1.6; color: #ddd;">
+                            Ouvre un formulaire pour saisir un élève manuellement (Nom, Prénom, Classe, Date de naissance, Sexe, coordonnées, PAI...)
+                        </p>
+                    </div>
+
+                    <div style="background: rgba(33, 150, 243, 0.1); border: 2px solid #2196F3; padding: 20px; border-radius: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <button class="button-mock" style="background: #2196F3; color: #fff; font-size: 0.85rem; padding: 8px 12px;">📂</button>
+                            <h5 style="color: #2196F3; margin: 0; font-size: 1.1rem;">Importer CSV/XLSX</h5>
+                        </div>
+                        <p style="font-size: 0.9rem; line-height: 1.6; color: #ddd;">
+                            Sélectionne un fichier CSV (Pronote, EDT...) ou Excel (.xlsx, .xls). Auto-détection de l'encodage et du séparateur.
+                        </p>
+                    </div>
+
+                    <div style="background: rgba(255, 152, 0, 0.1); border: 2px solid #FF9800; padding: 20px; border-radius: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <button class="button-mock" style="background: #FF9800; color: #fff; font-size: 0.85rem; padding: 8px 12px;">📋</button>
+                            <h5 style="color: #FF9800; margin: 0; font-size: 1.1rem;">RPP (Presse-Papier)</h5>
+                        </div>
+                        <p style="font-size: 0.9rem; line-height: 1.6; color: #ddd;">
+                            Copiez depuis Excel/Pronote (Ctrl+C) et collez ici. Auto-détection des séparateurs (TAB, point-virgule, virgule). <strong>⚡ La plus rapide !</strong>
+                        </p>
+                    </div>
+
+                    <div style="background: rgba(96, 125, 139, 0.1); border: 2px solid #607D8B; padding: 20px; border-radius: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                            <button class="button-mock" style="background: #607D8B; color: #fff; font-size: 0.85rem; padding: 8px 12px;">🎲</button>
+                            <h5 style="color: #607D8B; margin: 0; font-size: 1.1rem;">Exemple de données</h5>
+                        </div>
+                        <p style="font-size: 0.9rem; line-height: 1.6; color: #ddd;">
+                            Charge automatiquement 3 élèves fictifs pour découvrir et tester le module. Idéal pour la démonstration.
+                        </p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px; background: rgba(255, 165, 0, 0.15); border-left: 4px solid #FFA500; padding: 20px; border-radius: 5px;">
+                    <p style="font-size: 1rem; line-height: 1.8; margin: 0;">
+                        💡 <strong style="color: #FFA500;">Recommandation :</strong> La méthode <strong>RPP (Presse-Papier)</strong> est la plus rapide → Copier depuis Pronote → Coller → Importer (5 secondes !)<br>
+                        📊 <strong>Avantage :</strong> Pas de fichier intermédiaire, détection automatique du format
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 4 -->
+        <div class="step" id="step4">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <div class="step-title">Les Élèves Apparaissent dans le Tableau</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px; text-align: center; font-size: 1.05rem;">Après import, les élèves s'affichent dans le tableau avec toutes leurs informations :</p>
+                
+                <div style="background: #222; border-radius: 10px; border: 1px solid #444; overflow: hidden;">
+                    <!-- En-tête tableau -->
+                    <div style="background: rgba(255, 165, 0, 0.2); padding: 15px; display: grid; grid-template-columns: 1.2fr 1.2fr 1fr 0.8fr 0.8fr; gap: 10px; border-bottom: 2px solid #FFA500;">
+                        <div style="color: #FFA500; font-weight: bold;">Nom</div>
+                        <div style="color: #FFA500; font-weight: bold;">Prénom</div>
+                        <div style="color: #FFA500; font-weight: bold;">Classe</div>
+                        <div style="color: #FFA500; font-weight: bold;">Sexe</div>
+                        <div style="color: #FFA500; font-weight: bold;">Actions</div>
+                    </div>
+                    <!-- Lignes élèves -->
+                    <div style="padding: 15px; display: grid; grid-template-columns: 1.2fr 1.2fr 1fr 0.8fr 0.8fr; gap: 10px; border-bottom: 1px solid #333; background: rgba(255, 165, 0, 0.05);">
+                        <div style="color: #fff;">Dupont</div>
+                        <div style="color: #fff;">Marie</div>
+                        <div style="color: #00F2FF;">2GT01</div>
+                        <div style="color: #ff69b4;">F</div>
+                        <div>
+                            <button class="button-mock" style="background: #2196F3; padding: 5px 10px; font-size: 0.75rem; margin-right: 5px;">✏️</button>
+                            <button class="button-mock" style="background: #f44336; padding: 5px 10px; font-size: 0.75rem;">🗑️</button>
+                        </div>
+                    </div>
+                    <div style="padding: 15px; display: grid; grid-template-columns: 1.2fr 1.2fr 1fr 0.8fr 0.8fr; gap: 10px; border-bottom: 1px solid #333;">
+                        <div style="color: #fff;">Martin</div>
+                        <div style="color: #fff;">Lucas</div>
+                        <div style="color: #00F2FF;">2GT01</div>
+                        <div style="color: #4CAF50;">M</div>
+                        <div>
+                            <button class="button-mock" style="background: #2196F3; padding: 5px 10px; font-size: 0.75rem; margin-right: 5px;">✏️</button>
+                            <button class="button-mock" style="background: #f44336; padding: 5px 10px; font-size: 0.75rem;">🗑️</button>
+                        </div>
+                    </div>
+                    <div style="padding: 15px; display: grid; grid-template-columns: 1.2fr 1.2fr 1fr 0.8fr 0.8fr; gap: 10px; background: rgba(255, 165, 0, 0.05);">
+                        <div style="color: #fff;">Bernard</div>
+                        <div style="color: #fff;">Sophie</div>
+                        <div style="color: #00F2FF;">2GT02</div>
+                        <div style="color: #ff69b4;">F</div>
+                        <div>
+                            <button class="button-mock" style="background: #2196F3; padding: 5px 10px; font-size: 0.75rem; margin-right: 5px;">✏️</button>
+                            <button class="button-mock" style="background: #f44336; padding: 5px 10px; font-size: 0.75rem;">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                    <div style="background: #222; padding: 15px; border-radius: 8px; border: 1px solid #444; text-align: center;">
+                        <div style="font-size: 2rem; color: #FFA500; font-weight: bold;">3</div>
+                        <div style="color: #aaa; font-size: 0.9rem;">Élèves</div>
+                    </div>
+                    <div style="background: #222; padding: 15px; border-radius: 8px; border: 1px solid #444; text-align: center;">
+                        <div style="font-size: 2rem; color: #FFA500; font-weight: bold;">2</div>
+                        <div style="color: #aaa; font-size: 0.9rem;">Classes</div>
+                    </div>
+                    <div style="background: #222; padding: 15px; border-radius: 8px; border: 1px solid #444; text-align: center;">
+                        <div style="font-size: 1.5rem; color: #FFA500; font-weight: bold;">14:23</div>
+                        <div style="color: #aaa; font-size: 0.9rem;">Sauvegardé</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; background: rgba(255, 165, 0, 0.1); border-left: 4px solid #FFA500; padding: 20px; border-radius: 5px;">
+                    <p style="font-size: 1rem; line-height: 1.8; margin: 0;">
+                        ✅ <strong>Données chargées avec succès</strong><br>
+                        ✏️ <strong>Modifier :</strong> Cliquez sur le bouton bleu pour éditer un élève<br>
+                        🗑️ <strong>Supprimer :</strong> Cliquez sur le bouton rouge pour retirer un élève<br>
+                        📊 <strong>Statistiques :</strong> Mise à jour automatique en temps réel
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 5 -->
+        <div class="step" id="step5">
+            <div class="step-header">
+                <div class="step-number">5</div>
+                <div class="step-title">Cliquer sur "Charger dans LOGECPE" ✨</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px; text-align: center; font-size: 1.1rem;">C'est le moment clé ! Un simple clic transfère toutes les données :</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <button class="button-mock" style="background: #4CAF50; color: #fff; font-size: 1.3rem; padding: 20px 40px; font-weight: bold; box-shadow: 0 0 30px rgba(76, 175, 80, 0.6); animation: pulse 2s infinite;">
+                        💾 Charger dans LOGECPE
+                    </button>
+                </div>
+
+                <div style="background: rgba(76, 175, 80, 0.1); border-left: 4px solid #4CAF50; padding: 25px; border-radius: 5px; margin: 30px 0;">
+                    <h4 style="color: #4CAF50; margin-bottom: 15px; font-size: 1.2rem;">🚀 Le module effectue automatiquement :</h4>
+                    <div style="font-size: 1rem; line-height: 2; color: #ddd;">
+                        <div style="margin-bottom: 10px;">1️⃣ <strong>Formatage des données</strong> en CSV</div>
+                        <div style="margin-bottom: 10px;">2️⃣ <strong>Analyse et parsing</strong> (parseBerliozCSV)</div>
+                        <div style="margin-bottom: 10px;">3️⃣ <strong>Synchronisation</strong> avec LOGECPE (syncBerliozToAppData)</div>
+                        <div style="margin-bottom: 10px;">4️⃣ <strong>Mise à jour</strong> de la liste des classes</div>
+                        <div>5️⃣ <strong>Fermeture automatique</strong> du module</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; background: #222; padding: 20px; border-radius: 8px; border: 1px solid #4CAF50;">
+                    <div style="font-size: 3rem; color: #4CAF50; margin-bottom: 10px;">⚡</div>
+                    <p style="font-size: 1.2rem; color: #4CAF50; margin: 0; font-weight: bold;">Durée : moins d'une seconde !</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 6 -->
+        <div class="step" id="step6">
+            <div class="step-header">
+                <div class="step-number">6</div>
+                <div class="step-title">✅ Terminé - Élèves Chargés dans LOGECPE</div>
+            </div>
+            <div class="step-content">
+                <div style="text-align: center;">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #4CAF50, #66BB6A); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(76, 175, 80, 0.5);">
+                        <div style="font-size: 60px; color: white;">✓</div>
+                    </div>
+                    
+                    <h3 style="color: #4CAF50; margin: 20px 0; font-size: 2rem;">Importation Réussie !</h3>
+                    
+                    <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 25px; color: #ddd;">
+                        Le module Import se ferme automatiquement.<br>
+                        Vos élèves sont maintenant disponibles dans LOGECPE :
+                    </p>
+
+                    <div style="background: rgba(76, 175, 80, 0.1); border: 2px solid #4CAF50; padding: 30px; border-radius: 10px; text-align: left; margin-bottom: 25px;">
+                        <h4 style="color: #4CAF50; margin-bottom: 20px; font-size: 1.3rem;">✅ Ce qui est maintenant disponible :</h4>
+                        <div style="font-size: 1.05rem; line-height: 2.2; color: #ddd;">
+                            <div style="margin-bottom: 8px;">✓ <strong>Liste des classes</strong> dans la barre latérale (2GT01, 2GT02...)</div>
+                            <div style="margin-bottom: 8px;">✓ <strong>Fiches élèves</strong> consultables (Dupont Marie, Martin Lucas...)</div>
+                            <div style="margin-bottom: 8px;">✓ <strong>Recherche rapide</strong> par nom/prénom/classe</div>
+                            <div style="margin-bottom: 8px;">✓ <strong>Ajout d'observations</strong>, RDV, incidents</div>
+                            <div style="margin-bottom: 8px;">✓ <strong>Génération de statistiques</strong> et rapports</div>
+                            <div>✓ <strong>Impression des fiches</strong> personnalisées</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(0, 242, 255, 0.15), rgba(33, 150, 243, 0.15)); border: 2px solid #00F2FF; padding: 25px; border-radius: 10px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 2.5rem; margin-bottom: 15px;">🎉</div>
+                        <h4 style="color: #00F2FF; margin-bottom: 15px; font-size: 1.2rem;">Workflow Simplifié</h4>
+                        <p style="font-size: 1.1rem; line-height: 1.8; margin: 0; color: #ddd;">
+                            <strong>Import Établissement</strong> → <strong>Charger dans LOGECPE</strong> → <strong>Travaillez immédiatement !</strong>
+                        </p>
+                        <p style="font-size: 0.95rem; color: #aaa; margin-top: 15px;">
+                            Plus besoin de télécharger puis réimporter un fichier CSV !<br>
+                            Tout se fait en un seul clic, directement dans l'application.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="progress-dots" id="progressDots"></div>
+
+    <div class="controls">
+        <button class="control-button pause" id="playPauseBtn" onclick="togglePlayPause()">
+            ⏸️ Pause
+        </button>
+        <button class="control-button" onclick="location.reload()">
+            🔄 Recommencer
+        </button>
+    </div>
+
+    <div style="text-align: center; margin-top: 60px; padding: 30px; color: #888;">
+        <p><strong>LOGECPE NTP34</strong> - Diaporama Module Import Établissement</p>
+        <p style="margin-top: 10px; font-size: 0.9rem;">Diaporama interactif - 10 secondes par étape</p>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 6;
+        let autoPlayInterval = null;
+        let timerInterval = null;
+        let isPlaying = true;
+        const stepDuration = 60000; // 60 secondes
+        let timerProgress = 0;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Créer les points de navigation
+            const dotsContainer = document.getElementById('progressDots');
+            for (let i = 0; i < totalSteps; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.setAttribute('data-step', i + 1);
+                dot.onclick = () => goToStep(i);
+                dotsContainer.appendChild(dot);
+            }
+
+            // Afficher la première étape
+            showStep(1);
+            startAutoPlay();
+
+            // Clic droit pour avancer
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                nextStep();
+                return false;
+            });
+
+            // Touches clavier
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    nextStep();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    previousStep();
+                } else if (e.key === 'p' || e.key === 'P') {
+                    togglePlayPause();
+                }
+            });
+        });
+
+        function showStep(index) {
+            // Masquer toutes les étapes
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((step, i) => {
+                step.classList.remove('active', 'exiting');
+                if (i === index) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Mettre à jour les points
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            // Mettre à jour le compteur
+            document.getElementById('stepCounter').textContent = `Étape ${index + 1} / ${totalSteps}`;
+
+            // Réinitialiser la barre de progression
+            timerProgress = 0;
+            updateTimerBar();
+
+            currentStep = index;
+        }
+
+        function nextStep() {
+            const nextIndex = currentStep < totalSteps - 1 ? currentStep + 1 : 0;
+            showStep(nextIndex);
+            resetAutoPlay();
+        }
+
+        function previousStep() {
+            const prevIndex = currentStep > 0 ? currentStep - 1 : totalSteps - 1;
+            showStep(prevIndex);
+            resetAutoPlay();
+        }
+
+        function goToStep(index) {
+            showStep(index);
+            resetAutoPlay();
+        }
+
+        function startAutoPlay() {
+            if (isPlaying) {
+                autoPlayInterval = setInterval(() => {
+                    nextStep();
+                }, stepDuration);
+
+                timerInterval = setInterval(() => {
+                    timerProgress += 100;
+                    updateTimerBar();
+                }, 100);
+            }
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function resetAutoPlay() {
+            stopAutoPlay();
+            if (isPlaying) {
+                timerProgress = 0;
+                updateTimerBar();
+                startAutoPlay();
+            }
+        }
+
+        function togglePlayPause() {
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('playPauseBtn');
+            
+            if (isPlaying) {
+                btn.innerHTML = '⏸️ Pause';
+                btn.classList.remove('play');
+                btn.classList.add('pause');
+                startAutoPlay();
+            } else {
+                btn.innerHTML = '▶️ Lecture';
+                btn.classList.remove('pause');
+                btn.classList.add('play');
+                stopAutoPlay();
+            }
+        }
+
+        function updateTimerBar() {
+            const percentage = (timerProgress / stepDuration) * 100;
+            document.getElementById('timerBar').style.width = Math.min(percentage, 100) + '%';
+        }
+
+        window.addEventListener('beforeunload', function() {
+            stopAutoPlay();
+        });
+    </script>
+</body>
+</html>

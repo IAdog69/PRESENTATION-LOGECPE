@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diaporama - Module Agenda | LOGECPE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #FF9800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 8px rgba(255, 152, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #aaa;
+        }
+
+        .controls-info {
+            margin-top: 15px;
+            padding: 12px 25px;
+            background: rgba(255, 152, 0, 0.2);
+            border: 1px solid rgba(255, 152, 0, 0.5);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            display: inline-block;
+        }
+
+        .animation-container {
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            min-height: 600px;
+        }
+
+        /* Étapes */
+        .step {
+            display: none;
+            opacity: 0;
+        }
+
+        .step.active {
+            display: block;
+            animation: slideInFromRight 0.6s ease forwards;
+        }
+
+        .step.exiting {
+            animation: slideOutToLeft 0.6s ease forwards;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .step-title {
+            font-size: 1.8rem;
+            color: #FF9800;
+            flex: 1;
+        }
+
+        .step-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #ddd;
+        }
+
+        .step-content p {
+            margin-bottom: 15px;
+        }
+
+        .step-content ul {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .step-content ul li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .step-content ul li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #FF9800;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .button-mock {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            font-weight: 600;
+            color: white;
+        }
+
+        .button-mock:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 152, 0, 0.5);
+        }
+
+        .calendar-demo {
+            background: #1a1a1a;
+            border: 2px solid #FF9800;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .calendar-day:hover {
+            background: #3a3a3a;
+            border-color: #FF9800;
+        }
+
+        .calendar-day.has-event {
+            background: rgba(255, 152, 0, 0.2);
+            border-color: #FF9800;
+        }
+
+        .calendar-day.header {
+            background: #FF9800;
+            color: black;
+            font-weight: bold;
+            cursor: default;
+        }
+
+        .rdv-card {
+            background: rgba(233, 30, 99, 0.1);
+            border: 2px solid #E91E63;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .rdv-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .rdv-time {
+            background: #E91E63;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .rdv-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .rdv-status.validated {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .rdv-status.pending {
+            background: #FF9800;
+            color: black;
+        }
+
+        .rdv-status.cancelled {
+            background: #F44336;
+            color: white;
+        }
+
+        .convocation-preview {
+            background: white;
+            color: black;
+            border: 3px solid #E91E63;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .convocation-header {
+            text-align: center;
+            border-bottom: 2px solid #E91E63;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .convocation-title {
+            font-size: 1.5rem;
+            color: #E91E63;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.2), rgba(245, 124, 0, 0.2));
+            border: 2px solid #FF9800;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .feature-box {
+            background: rgba(255, 152, 0, 0.1);
+            border-left: 4px solid #FF9800;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .feature-box h4 {
+            color: #FF9800;
+            margin-bottom: 10px;
+        }
+
+        /* Navigation */
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50px;
+        }
+
+        .dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .dot:hover {
+            transform: scale(1.3);
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .dot.active {
+            background: #FF9800;
+            box-shadow: 0 0 20px rgba(255, 152, 0, 0.8);
+            transform: scale(1.4);
+        }
+
+        .dot::after {
+            content: attr(data-step);
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #aaa;
+            white-space: nowrap;
+        }
+
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 152, 0, 0.3);
+            border: 2px solid rgba(255, 152, 0, 0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255, 152, 0, 0.6);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-arrow.left {
+            left: 20px;
+        }
+
+        .nav-arrow.right {
+            right: 20px;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            background: rgba(255, 152, 0, 0.3);
+            border: 2px solid rgba(255, 152, 0, 0.5);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 152, 0, 0.6);
+            transform: scale(1.05);
+        }
+
+        .step-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            border: 2px solid #FF9800;
+            z-index: 100;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutToLeft {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-100px);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 15px rgba(255, 152, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 4px 30px rgba(255, 152, 0, 0.8);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(255, 152, 0, 0.8);
+            }
+        }
+
+        .timer-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #FF9800, #F57C00);
+            width: 0%;
+            z-index: 10000;
+            transition: width 0.1s linear;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="timer-bar" id="timerBar"></div>
+    <div class="step-counter" id="stepCounter">Étape 1 / 8</div>
+
+    <div class="header">
+        <h1>📅 Module Agenda - LOGECPE</h1>
+        <p>Gérez vos saisies et rendez-vous en toute simplicité</p>
+        <div class="controls-info">
+            ⌨️ Flèches ← → ou Espace pour naviguer | P pour Pause | Clic droit pour avancer
+        </div>
+    </div>
+
+    <div class="animation-container">
+        
+        <!-- ÉTAPE 1: Vue d'ensemble -->
+        <div class="step" id="step1">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">Vue d'Ensemble - Deux Agendas Complémentaires</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px; font-size: 1.2rem; color: #FF9800; text-align: center;">
+                    LOGECPE vous propose <strong>deux modules d'agenda</strong> pour une gestion complète
+                </p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0;">
+                    
+                    <!-- Agenda des Saisies -->
+                    <div style="background: linear-gradient(135deg, rgba(255, 152, 0, 0.15), rgba(255, 152, 0, 0.05)); border: 2px solid #FF9800; border-radius: 15px; padding: 25px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 3rem;">📝</div>
+                            <h3 style="color: #FF9800; font-size: 1.5rem; margin-top: 10px;">Agenda des Saisies</h3>
+                        </div>
+                        <ul style="font-size: 0.95rem; line-height: 1.8;">
+                            <li>📅 Vue mensuelle avec calendrier</li>
+                            <li>✍️ Saisie quotidienne d'observations</li>
+                            <li>👥 Notes sur les élèves</li>
+                            <li>📊 Suivi d'activités journalières</li>
+                            <li>🔍 Recherche par date</li>
+                            <li>🖨️ Impression des rapports</li>
+                        </ul>
+                        <div style="margin-top: 20px; text-align: center;">
+                            <button class="button-mock" style="background: #FF9800; color: black;">📅 Agenda des saisies</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Agenda RDV -->
+                    <div style="background: linear-gradient(135deg, rgba(233, 30, 99, 0.15), rgba(233, 30, 99, 0.05)); border: 2px solid #E91E63; border-radius: 15px; padding: 25px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="font-size: 3rem;">📞</div>
+                            <h3 style="color: #E91E63; font-size: 1.5rem; margin-top: 10px;">Agenda RDV</h3>
+                        </div>
+                        <ul style="font-size: 0.95rem; line-height: 1.8;">
+                            <li>📅 Planification des rendez-vous</li>
+                            <li>⏰ Gestion des créneaux horaires</li>
+                            <li>👨‍👩‍👧 RDV Parents / Famille / Réunion</li>
+                            <li>📄 Convocations automatiques</li>
+                            <li>✅ Suivi statut (Validé/Attente/Annulé)</li>
+                            <li>🖨️ Impression convocations</li>
+                        </ul>
+                        <div style="margin-top: 20px; text-align: center;">
+                            <button class="button-mock" style="background: #E91E63; color: white;">📅 Agenda RDV</button>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="highlight">
+                    🎯 <strong>Deux outils puissants</strong> pour gérer toute votre activité CPE : les saisies quotidiennes ET les rendez-vous planifiés !
+                </div>
+            </div>
+        </div>
+        
+        <!-- ÉTAPE 2: Agenda des Saisies - Interface -->
+        <div class="step" id="step2">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title">Agenda des Saisies - Interface Calendrier</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px;">
+                    L'<strong>Agenda des Saisies</strong> vous permet de noter toutes vos observations et activités quotidiennes dans un calendrier mensuel.
+                </p>
+                
+                <div class="calendar-demo">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <button class="button-mock" style="background: #666; padding: 8px 15px;">◀</button>
+                        <h3 style="color: #FF9800; font-size: 1.3rem;">Janvier 2026</h3>
+                        <button class="button-mock" style="background: #666; padding: 8px 15px;">▶</button>
+                    </div>
+                    
+                    <div class="calendar-grid">
+                        <!-- En-têtes -->
+                        <div class="calendar-day header">Lun</div>
+                        <div class="calendar-day header">Mar</div>
+                        <div class="calendar-day header">Mer</div>
+                        <div class="calendar-day header">Jeu</div>
+                        <div class="calendar-day header">Ven</div>
+                        <div class="calendar-day header">Sam</div>
+                        <div class="calendar-day header">Dim</div>
+                        
+                        <!-- Jours vides début -->
+                        <div class="calendar-day" style="opacity: 0.3;"></div>
+                        <div class="calendar-day" style="opacity: 0.3;"></div>
+                        
+                        <!-- Jours du mois -->
+                        <div class="calendar-day">1</div>
+                        <div class="calendar-day">2</div>
+                        <div class="calendar-day">3</div>
+                        <div class="calendar-day">4</div>
+                        <div class="calendar-day">5</div>
+                        
+                        <div class="calendar-day has-event" style="animation: glow 2s infinite;">
+                            6
+                            <div style="position: absolute; bottom: 2px; width: 80%; height: 4px; background: #FF9800; border-radius: 2px;"></div>
+                        </div>
+                        <div class="calendar-day">7</div>
+                        <div class="calendar-day">8</div>
+                        <div class="calendar-day">9</div>
+                        <div class="calendar-day">10</div>
+                        <div class="calendar-day">11</div>
+                        <div class="calendar-day">12</div>
+                        
+                        <div class="calendar-day has-event">
+                            13
+                            <div style="position: absolute; bottom: 2px; width: 80%; height: 4px; background: #FF9800; border-radius: 2px;"></div>
+                        </div>
+                        <div class="calendar-day">14</div>
+                        <div class="calendar-day has-event">
+                            15
+                            <div style="position: absolute; bottom: 2px; width: 80%; height: 4px; background: #FF9800; border-radius: 2px;"></div>
+                        </div>
+                        <div class="calendar-day">16</div>
+                        <div class="calendar-day">17</div>
+                        <div class="calendar-day">18</div>
+                        <div class="calendar-day">19</div>
+                        
+                        <div class="calendar-day has-event">
+                            20
+                            <div style="position: absolute; bottom: 2px; width: 80%; height: 4px; background: #FF9800; border-radius: 2px;"></div>
+                        </div>
+                        <div class="calendar-day">21</div>
+                        <div class="calendar-day">22</div>
+                        <div class="calendar-day">23</div>
+                        <div class="calendar-day">24</div>
+                        <div class="calendar-day">25</div>
+                        <div class="calendar-day">26</div>
+                        
+                        <div class="calendar-day has-event">
+                            27
+                            <div style="position: absolute; bottom: 2px; width: 80%; height: 4px; background: #FF9800; border-radius: 2px;"></div>
+                        </div>
+                        <div class="calendar-day">28</div>
+                        <div class="calendar-day">29</div>
+                        <div class="calendar-day">30</div>
+                        <div class="calendar-day" style="background: rgba(0, 242, 255, 0.2); border-color: #00F2FF;">31<br><small style="font-size: 0.7rem;">Aujourd'hui</small></div>
+                    </div>
+                </div>
+
+                <div class="feature-box">
+                    <h4>💡 Comment ça marche ?</h4>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="padding: 5px 0;">✓ <strong>Cliquez sur un jour</strong> pour ajouter ou voir les saisies</li>
+                        <li style="padding: 5px 0;">✓ Les jours avec saisies affichent <span style="color: #FF9800;">une barre orange</span></li>
+                        <li style="padding: 5px 0;">✓ Naviguez entre les mois avec les flèches ◀ ▶</li>
+                        <li style="padding: 5px 0;">✓ Imprimez vos rapports mensuels en un clic</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ÉTAPE 3: Agenda des Saisies - Saisie de données -->
+        <div class="step" id="step3">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title">Saisie des Observations Quotidiennes</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px;">
+                    Après avoir cliqué sur un jour du calendrier, une fenêtre s'ouvre pour saisir vos observations.
+                </p>
+                
+                <div style="background: #1a1a1a; border: 3px solid #FF9800; border-radius: 15px; padding: 25px; margin: 20px 0; box-shadow: 0 10px 40px rgba(255, 152, 0, 0.3);">
+                    
+                    <!-- En-tête modal -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FF9800; padding-bottom: 15px; margin-bottom: 20px;">
+                        <h3 style="color: #FF9800; margin: 0;">📝 Saisie du Lundi 6 Janvier 2026</h3>
+                        <div style="width: 30px; height: 30px; background: #F44336; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</div>
+                    </div>
+                    
+                    <!-- Zone de texte -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; color: #aaa; margin-bottom: 8px; font-size: 0.9rem;">Observations et activités du jour :</label>
+                        <textarea style="width: 100%; height: 200px; background: #2a2a2a; border: 2px solid #555; border-radius: 8px; padding: 15px; color: white; font-size: 1rem; font-family: inherit; resize: vertical;" placeholder="Saisissez vos notes, observations, événements de la journée...">- Entretien avec Lucas MARTIN (2GT01) : comportement en amélioration
+- Réunion équipe éducative : mise en place tutorat
+- Suivi absences : 3 élèves absents non justifiés
+- Organisation sortie pédagogique prévue le 15/01
+- Appel parents de Sophie BERNARD pour RDV</textarea>
+                    </div>
+                    
+                    <!-- Boutons d'action -->
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="button-mock" style="background: #666; padding: 10px 25px;">Annuler</button>
+                        <button class="button-mock" style="background: #4CAF50; padding: 10px 25px;">💾 Enregistrer</button>
+                    </div>
+                    
+                </div>
+
+                <div class="feature-box">
+                    <h4>✨ Fonctionnalités de saisie</h4>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="padding: 5px 0;">📝 <strong>Texte libre</strong> : Écrivez ce que vous voulez</li>
+                        <li style="padding: 5px 0;">💾 <strong>Sauvegarde automatique</strong> dans le navigateur</li>
+                        <li style="padding: 5px 0;">✏️ <strong>Modification</strong> à tout moment en re-cliquant sur le jour</li>
+                        <li style="padding: 5px 0;">🗑️ <strong>Suppression</strong> possible des anciennes saisies</li>
+                        <li style="padding: 5px 0;">📄 <strong>Historique complet</strong> accessible par date</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ÉTAPE 4: Agenda RDV - Vue principale -->
+        <div class="step" id="step4">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <div class="step-title">Agenda RDV - Vue Principale</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px;">
+                    L'<strong>Agenda RDV</strong> vous permet de planifier et gérer tous vos rendez-vous avec les parents, élèves et collègues.
+                </p>
+                
+                <div style="background: #1a1a1a; border: 3px solid #E91E63; border-radius: 15px; padding: 25px; margin: 20px 0;">
+                    
+                    <!-- Barre d'outils -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;">
+                        <button class="button-mock" style="background: linear-gradient(135deg, #4CAF50, #45a049); box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4); animation: glow 2s infinite;">➕ Nouveau RDV</button>
+                        <button class="button-mock" style="background: #2196F3;">📅 Vue Calendrier</button>
+                        <button class="button-mock" style="background: #FF9800;">📋 Vue Liste</button>
+                        <button class="button-mock" style="background: #9C27B0;">🖨️ Imprimer Convocations</button>
+                        <button class="button-mock" style="background: #666;">🔍 Rechercher</button>
+                    </div>
+                    
+                    <!-- Liste des RDV -->
+                    <h4 style="color: #E91E63; margin-bottom: 15px; font-size: 1.2rem;">📋 Rendez-vous à venir</h4>
+                    
+                    <!-- RDV 1 -->
+                    <div class="rdv-card">
+                        <div class="rdv-card-header">
+                            <div>
+                                <strong style="font-size: 1.1rem; color: #E91E63;">RDV Parents - Marie DUPONT</strong>
+                                <div style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">2GT01 • Comportement en classe</div>
+                            </div>
+                            <div class="rdv-status validated">✅ Validé</div>
+                        </div>
+                        <div style="display: flex; gap: 20px; margin-top: 10px;">
+                            <div><strong style="color: #FF9800;">📅 Date :</strong> 10/02/2026</div>
+                            <div><strong style="color: #FF9800;">⏰ Heure :</strong> 14:00</div>
+                            <div><strong style="color: #FF9800;">⏱️ Durée :</strong> 30 min</div>
+                        </div>
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button class="button-mock" style="background: #2196F3; padding: 5px 15px; font-size: 0.85rem;">✏️ Modifier</button>
+                            <button class="button-mock" style="background: #9C27B0; padding: 5px 15px; font-size: 0.85rem;">🖨️ Convocation</button>
+                            <button class="button-mock" style="background: #F44336; padding: 5px 15px; font-size: 0.85rem;">🗑️ Annuler</button>
+                        </div>
+                    </div>
+                    
+                    <!-- RDV 2 -->
+                    <div class="rdv-card">
+                        <div class="rdv-card-header">
+                            <div>
+                                <strong style="font-size: 1.1rem; color: #E91E63;">Réunion Équipe - Lucas MARTIN</strong>
+                                <div style="color: #aaa; font-size: 0.9rem; margin-top: 5px;">3E2 • Conseil éducatif</div>
+                            </div>
+                            <div class="rdv-status pending">⏳ En attente</div>
+                        </div>
+                        <div style="display: flex; gap: 20px; margin-top: 10px;">
+                            <div><strong style="color: #FF9800;">📅 Date :</strong> 15/02/2026</div>
+                            <div><strong style="color: #FF9800;">⏰ Heure :</strong> 10:00</div>
+                            <div><strong style="color: #FF9800;">⏱️ Durée :</strong> 45 min</div>
+                        </div>
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button class="button-mock" style="background: #2196F3; padding: 5px 15px; font-size: 0.85rem;">✏️ Modifier</button>
+                            <button class="button-mock" style="background: #4CAF50; padding: 5px 15px; font-size: 0.85rem;">✅ Valider</button>
+                            <button class="button-mock" style="background: #F44336; padding: 5px 15px; font-size: 0.85rem;">🗑️ Annuler</button>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="highlight">
+                    🎯 Visualisez tous vos rendez-vous en un coup d'œil avec leur statut, date et actions disponibles !
+                </div>
+            </div>
+        </div>
+        
+        <!-- ÉTAPE 5: Création d'un RDV -->
+        <div class="step" id="step5">
+            <div class="step-header">
+                <div class="step-number">5</div>
+                <div class="step-title">Créer un Nouveau Rendez-vous</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px;">
+                    Cliquez sur <strong>➕ Nouveau RDV</strong> pour ouvrir le formulaire de création.
+                </p>
+                
+                <div style="background: #1a1a1a; border: 3px solid #E91E63; border-radius: 15px; padding: 25px; margin: 20px 0; max-height: 500px; overflow-y: auto;">
+                    
+                    <!-- En-tête -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #E91E63; padding-bottom: 15px; margin-bottom: 20px;">
+                        <h3 style="color: #E91E63; margin: 0;">➕ Nouveau Rendez-vous</h3>
+                        <div style="width: 30px; height: 30px; background: #F44336; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</div>
+                    </div>
+                    
+                    <!-- Type de RDV -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; color: #aaa; margin-bottom: 8px;">Type de rendez-vous :</label>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="button-mock" style="background: #4CAF50; padding: 10px 20px; border: 2px solid #4CAF50;">📞 RDV Standard</button>
+                            <button class="button-mock" style="background: transparent; border: 2px solid #666; padding: 10px 20px;">👨‍👩‍👧 RDV Famille</button>
+                            <button class="button-mock" style="background: transparent; border: 2px solid #666; padding: 10px 20px;">👥 Réunion</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Titre -->
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #aaa; margin-bottom: 8px;">Titre :</label>
+                        <input type="text" value="RDV Parents - Marie DUPONT" style="width: 100%; background: #2a2a2a; border: 2px solid #555; border-radius: 8px; padding: 10px; color: white; font-size: 1rem;">
+                    </div>
+                    
+                    <!-- Date -->
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #aaa; margin-bottom: 8px;">Date :</label>
+                        <input type="date" value="2026-02-10" style="width: 100%; background: #2a2a2a; border: 2px solid #555; border-radius: 8px; padding: 10px; color: white; font-size: 1rem;">
+                    </div>
+                    
+                    <!-- Créneaux horaires disponibles -->
+                    <div style="margin-bottom: 15px; background: rgba(0, 242, 255, 0.05); border: 1px dashed #00F2FF; border-radius: 8px; padding: 15px;">
+                        <label style="display: block; color: #00F2FF; margin-bottom: 10px; font-weight: bold;">⏰ Créneaux disponibles :</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px; max-height: 120px; overflow-y: auto;">
+                            <div style="background: #444; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85rem;">08:00</div>
+                            <div style="background: #444; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85rem;">08:15</div>
+                            <div style="background: #444; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85rem;">08:30</div>
+                            <div style="background: #444; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85rem;">08:45</div>
+                            <div style="background: #444; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85rem;">09:00</div>
+                            <div style="background: #4CAF50; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85rem; border: 2px solid #4CAF50;">14:00 ✓</div>
+                            <div style="background: #444; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85rem;">14:15</div>
+                            <div style="background: #444; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85rem;">14:30</div>
+                            <div style="background: #444; color: white; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85rem;">14:45</div>
+                        </div>
+                        <p style="margin-top: 10px; font-size: 0.85rem; color: #aaa;">💡 Cliquez sur un créneau pour le sélectionner (intervalles de 15 minutes de 8h à 19h45)</p>
+                    </div>
+                    
+                    <!-- Durée -->
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #aaa; margin-bottom: 8px;">Durée :</label>
+                        <select style="width: 100%; background: #2a2a2a; border: 2px solid #555; border-radius: 8px; padding: 10px; color: white; font-size: 1rem;">
+                            <option>15 minutes</option>
+                            <option selected>30 minutes</option>
+                            <option>45 minutes</option>
+                            <option>60 minutes</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Élèves concernés -->
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #aaa; margin-bottom: 8px;">Élèves concernés :</label>
+                        <div style="background: #2a2a2a; border: 2px solid #555; border-radius: 8px; padding: 10px; min-height: 60px;">
+                            <div style="display: inline-block; background: #E91E63; color: white; padding: 5px 12px; border-radius: 15px; margin: 3px;">
+                                Marie DUPONT (2GT01) <span style="cursor: pointer; margin-left: 5px;">✕</span>
+                            </div>
+                        </div>
+                        <button class="button-mock" style="background: #4CAF50; padding: 8px 15px; margin-top: 10px; font-size: 0.85rem;">➕ Ajouter un élève</button>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; color: #aaa; margin-bottom: 8px;">Description / Motif :</label>
+                        <textarea style="width: 100%; height: 80px; background: #2a2a2a; border: 2px solid #555; border-radius: 8px; padding: 10px; color: white; font-size: 1rem; resize: vertical;" placeholder="Motif du rendez-vous...">Entretien suite aux difficultés de comportement en classe</textarea>
+                    </div>
+                    
+                    <!-- Boutons -->
+                    <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                        <button class="button-mock" style="background: #666; padding: 10px 25px;">Annuler</button>
+                        <button class="button-mock" style="background: #4CAF50; padding: 10px 25px;">💾 Créer le RDV</button>
+                    </div>
+                    
+                </div>
+
+                <div class="feature-box">
+                    <h4>✨ Options avancées</h4>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="padding: 5px 0;">⏰ <strong>Créneaux intelligents</strong> : Seuls les créneaux libres sont affichés</li>
+                        <li style="padding: 5px 0;">👥 <strong>Multi-élèves</strong> : Ajoutez plusieurs élèves pour un RDV famille</li>
+                        <li style="padding: 5px 0;">📞 <strong>Types de RDV</strong> : Standard (1 élève), Famille (plusieurs élèves) ou Réunion</li>
+                        <li style="padding: 5px 0;">📝 <strong>Nom du CPE</strong> pour personnaliser les convocations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ÉTAPE 6: Convocations automatisées -->
+        <div class="step" id="step6">
+            <div class="step-header">
+                <div class="step-number">6</div>
+                <div class="step-title">Convocations Automatisées</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px;">
+                    LOGECPE génère automatiquement des <strong>convocations professionnelles</strong> prêtes à imprimer pour chaque RDV.
+                </p>
+                
+                <div class="convocation-preview">
+                    <div class="convocation-header">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="text-align: left;">
+                                <strong>Établissement :</strong><br>
+                                Lycée Victor Hugo<br>
+                                123 Rue de l'Éducation<br>
+                                75000 Paris
+                            </div>
+                            <div style="text-align: right;">
+                                <strong>Le :</strong> 31/01/2026
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="convocation-title">CONVOCATION</div>
+                    
+                    <div style="margin: 25px 0; line-height: 1.8;">
+                        <p style="margin-bottom: 15px;">
+                            <strong>Madame, Monsieur,</strong>
+                        </p>
+                        
+                        <p style="margin-bottom: 15px;">
+                            Nous vous prions de bien vouloir vous présenter au lycée le :
+                        </p>
+                        
+                        <div style="background: rgba(233, 30, 99, 0.1); border: 2px solid #E91E63; border-radius: 10px; padding: 20px; margin: 20px 0; text-align: center;">
+                            <div style="font-size: 1.3rem; font-weight: bold; color: #E91E63; margin-bottom: 10px;">
+                                📅 Mercredi 10 Février 2026
+                            </div>
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #E91E63;">
+                                ⏰ 14h00
+                            </div>
+                        </div>
+                        
+                        <p style="margin-bottom: 15px;">
+                            <strong>Motif :</strong> Entretien suite aux difficultés de comportement en classe
+                        </p>
+                        
+                        <p style="margin-bottom: 15px;">
+                            <strong>Élève concerné :</strong> Marie DUPONT - Classe de 2GT01
+                        </p>
+                        
+                        <p style="margin-bottom: 15px;">
+                            <strong>Durée estimée :</strong> 30 minutes
+                        </p>
+                        
+                        <p style="margin-top: 30px;">
+                            Nous vous remercions de confirmer votre présence par téléphone ou par mail.
+                        </p>
+                        
+                        <p style="margin-top: 40px; text-align: right;">
+                            <strong>M. Jean DUPONT</strong><br>
+                            <em>Conseiller Principal d'Éducation</em>
+                        </p>
+                    </div>
+                    
+                    <div style="border-top: 2px dashed #E91E63; margin-top: 30px; padding-top: 15px; font-size: 0.85rem; color: #666;">
+                        <strong>Contact :</strong> cpe@lycee-victorhugo.fr | Tél : 01 23 45 67 89
+                    </div>
+                </div>
+
+                <div class="feature-box">
+                    <h4>🖨️ Options d'impression</h4>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="padding: 5px 0;">📄 <strong>Format A4</strong> standard prêt à imprimer</li>
+                        <li style="padding: 5px 0;">✏️ <strong>Personnalisable</strong> : nom du CPE, établissement, motif</li>
+                        <li style="padding: 5px 0;">📋 <strong>Impression groupée</strong> : Imprimez plusieurs convocations d'un coup</li>
+                        <li style="padding: 5px 0;">💾 <strong>Export PDF</strong> possible pour envoi par email</li>
+                        <li style="padding: 5px 0;">📅 <strong>Mise à jour automatique</strong> des dates et horaires</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ÉTAPE 7: Gestion des statuts -->
+        <div class="step" id="step7">
+            <div class="step-header">
+                <div class="step-number">7</div>
+                <div class="step-title">Suivi et Gestion des Statuts</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px;">
+                    Chaque RDV possède un <strong>statut</strong> pour suivre son avancement : Validé, En attente, ou Annulé.
+                </p>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 30px 0;">
+                    
+                    <!-- Statut Validé -->
+                    <div style="background: rgba(76, 175, 80, 0.1); border: 2px solid #4CAF50; border-radius: 15px; padding: 20px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">✅</div>
+                        <h4 style="color: #4CAF50; margin-bottom: 10px;">Validé</h4>
+                        <p style="font-size: 0.9rem; color: #aaa;">
+                            RDV confirmé par les parents. Convocation imprimée et envoyée.
+                        </p>
+                    </div>
+                    
+                    <!-- Statut En attente -->
+                    <div style="background: rgba(255, 152, 0, 0.1); border: 2px solid #FF9800; border-radius: 15px; padding: 20px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">⏳</div>
+                        <h4 style="color: #FF9800; margin-bottom: 10px;">En attente</h4>
+                        <p style="font-size: 0.9rem; color: #aaa;">
+                            RDV créé, en attente de confirmation des parents.
+                        </p>
+                    </div>
+                    
+                    <!-- Statut Annulé -->
+                    <div style="background: rgba(244, 67, 54, 0.1); border: 2px solid #F44336; border-radius: 15px; padding: 20px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">❌</div>
+                        <h4 style="color: #F44336; margin-bottom: 10px;">Annulé / Absent</h4>
+                        <p style="font-size: 0.9rem; color: #aaa;">
+                            RDV annulé ou parents absents. Possibilité de reprogrammer.
+                        </p>
+                    </div>
+                    
+                </div>
+
+                <div style="background: #1a1a1a; border: 2px solid #2196F3; border-radius: 15px; padding: 25px; margin: 20px 0;">
+                    <h4 style="color: #2196F3; margin-bottom: 15px;">🔄 Changer le statut d'un RDV</h4>
+                    
+                    <div style="background: #2a2a2a; border-radius: 10px; padding: 20px;">
+                        <div style="margin-bottom: 20px;">
+                            <strong style="color: #E91E63;">RDV Parents - Marie DUPONT</strong><br>
+                            <span style="color: #aaa; font-size: 0.9rem;">10/02/2026 à 14:00</span>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; justify-content: center; margin: 20px 0;">
+                            <button class="button-mock" style="background: #4CAF50; padding: 12px 25px; border: 2px solid #4CAF50;">✅ Validé</button>
+                            <button class="button-mock" style="background: transparent; border: 2px solid #666; padding: 12px 25px;">⏳ En Attente</button>
+                            <button class="button-mock" style="background: transparent; border: 2px solid #666; padding: 12px 25px;">❌ Annulé/Abs</button>
+                        </div>
+                        
+                        <p style="text-align: center; color: #aaa; font-size: 0.9rem; margin-top: 15px;">
+                            💡 Cliquez sur un bouton pour changer le statut instantanément
+                        </p>
+                    </div>
+                </div>
+
+                <div class="feature-box">
+                    <h4>📊 Statistiques et suivi</h4>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li style="padding: 5px 0;">📈 <strong>Compteur de RDV</strong> affiché dans l'en-tête (ex: "RDV: 3")</li>
+                        <li style="padding: 5px 0;">📅 <strong>Vue par date</strong> : Filtrez vos RDV par jour, semaine ou mois</li>
+                        <li style="padding: 5px 0;">🔍 <strong>Recherche</strong> : Trouvez rapidement un RDV par nom d'élève ou date</li>
+                        <li style="padding: 5px 0;">📊 <strong>Export des données</strong> : Générez des rapports de RDV</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ÉTAPE 8: Fonctionnalités avancées -->
+        <div class="step" id="step8">
+            <div class="step-header">
+                <div class="step-number">8</div>
+                <div class="step-title">Fonctionnalités Avancées de l'Agenda</div>
+            </div>
+            <div class="step-content">
+                <p style="margin-bottom: 20px; font-size: 1.2rem; color: #FF9800; text-align: center;">
+                    LOGECPE vous offre des <strong>outils puissants</strong> pour optimiser votre gestion quotidienne
+                </p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0;">
+                    
+                    <!-- Impression groupée -->
+                    <div class="feature-box">
+                        <h4>🖨️ Impression Groupée</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">
+                            Sélectionnez plusieurs RDV et imprimez toutes les convocations en une seule fois. Gain de temps énorme pour les journées de RDV parents !
+                        </p>
+                        <div style="margin-top: 15px; text-align: center;">
+                            <button class="button-mock" style="background: #9C27B0; padding: 10px 20px;">🖨️ Imprimer Convocations</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Vue Calendrier -->
+                    <div class="feature-box">
+                        <h4>📅 Vue Calendrier</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">
+                            Visualisez tous vos RDV directement sur un calendrier mensuel. Identifiez rapidement les créneaux chargés et les disponibilités.
+                        </p>
+                        <div style="margin-top: 15px; text-align: center;">
+                            <button class="button-mock" style="background: #2196F3; padding: 10px 20px;">📅 Vue Calendrier</button>
+                        </div>
+                    </div>
+                    
+                    <!-- RDV Famille -->
+                    <div class="feature-box">
+                        <h4>👨‍👩‍👧 RDV Famille</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">
+                            Pour les familles avec plusieurs enfants, créez un RDV unique qui concerne plusieurs élèves. La convocation listera tous les enfants concernés.
+                        </p>
+                    </div>
+                    
+                    <!-- Réunions -->
+                    <div class="feature-box">
+                        <h4>👥 Réunions Multi-créneaux</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">
+                            Pour les réunions longues, sélectionnez plusieurs créneaux consécutifs (ex: 14h00, 14h15, 14h30) pour bloquer une plage horaire complète.
+                        </p>
+                    </div>
+                    
+                    <!-- Recherche -->
+                    <div class="feature-box">
+                        <h4>🔍 Recherche Intelligente</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">
+                            Trouvez instantanément un RDV en tapant le nom d'un élève, une date ou un mot-clé du motif. Filtrage en temps réel.
+                        </p>
+                    </div>
+                    
+                    <!-- Historique -->
+                    <div class="feature-box">
+                        <h4>📜 Historique Complet</h4>
+                        <p style="font-size: 0.95rem; line-height: 1.6;">
+                            Tous vos RDV passés sont conservés avec leur statut final. Consultez l'historique des entretiens pour chaque élève.
+                        </p>
+                    </div>
+                    
+                </div>
+
+                <div style="background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(33, 150, 243, 0.2)); border: 3px solid #4CAF50; border-radius: 15px; padding: 30px; text-align: center; margin-top: 30px;">
+                    <div style="font-size: 2.5rem; margin-bottom: 15px;">🎉</div>
+                    <h3 style="color: #4CAF50; font-size: 1.5rem; margin-bottom: 15px;">
+                        Vous êtes maintenant prêt à utiliser l'Agenda LOGECPE !
+                    </h3>
+                    <p style="font-size: 1.1rem; color: #ddd; line-height: 1.8;">
+                        Avec l'<strong>Agenda des Saisies</strong> et l'<strong>Agenda RDV</strong>, gérez toute votre activité de CPE de manière professionnelle et efficace. 
+                    </p>
+                    <div style="margin-top: 25px;">
+                        <button class="button-mock" style="background: linear-gradient(135deg, #FF9800, #F57C00); padding: 15px 35px; font-size: 1.1rem; box-shadow: 0 5px 20px rgba(255, 152, 0, 0.5);">
+                            📅 Ouvrir LOGECPE
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-arrow left" onclick="previousStep()">◀</div>
+    <div class="nav-arrow right" onclick="nextStep()">▶</div>
+
+    <div class="progress-dots" id="progressDots"></div>
+
+    <div class="controls">
+        <button class="control-btn" id="playPauseBtn" onclick="togglePlayPause()">⏸ Pause</button>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 8;
+        let autoPlayInterval = null;
+        let timerInterval = null;
+        let isPlaying = true;
+        const stepDuration = 60000; // 60 secondes
+        let timerProgress = 0;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Créer les points de navigation
+            const dotsContainer = document.getElementById('progressDots');
+            for (let i = 0; i < totalSteps; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                dot.setAttribute('data-step', i + 1);
+                dot.onclick = () => goToStep(i + 1);
+                dotsContainer.appendChild(dot);
+            }
+
+            // Afficher la première étape
+            showStep(1);
+            startAutoPlay();
+
+            // Clic droit pour avancer
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                nextStep();
+                return false;
+            });
+
+            // Touches clavier
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    nextStep();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    previousStep();
+                } else if (e.key === 'p' || e.key === 'P') {
+                    togglePlayPause();
+                }
+            });
+        });
+
+        function showStep(index) {
+            // Masquer toutes les étapes
+            const steps = document.querySelectorAll('.step');
+            steps.forEach((step, i) => {
+                step.classList.remove('active', 'exiting');
+                if (i + 1 === index) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Mettre à jour les points
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, i) => {
+                if (i + 1 === index) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+
+            // Mettre à jour le compteur
+            document.getElementById('stepCounter').textContent = `Étape ${index} / ${totalSteps}`;
+
+            // Reset timer
+            resetTimer();
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            } else {
+                currentStep = 1;
+                showStep(currentStep);
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        }
+
+        function goToStep(stepNumber) {
+            currentStep = stepNumber;
+            showStep(currentStep);
+        }
+
+        function startAutoPlay() {
+            if (autoPlayInterval) clearInterval(autoPlayInterval);
+            if (timerInterval) clearInterval(timerInterval);
+            
+            autoPlayInterval = setInterval(() => {
+                nextStep();
+            }, stepDuration);
+
+            startTimer();
+            isPlaying = true;
+            document.getElementById('playPauseBtn').textContent = '⏸ Pause';
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            isPlaying = false;
+            document.getElementById('playPauseBtn').textContent = '▶ Play';
+        }
+
+        function togglePlayPause() {
+            if (isPlaying) {
+                stopAutoPlay();
+            } else {
+                startAutoPlay();
+            }
+        }
+
+        function startTimer() {
+            timerProgress = 0;
+            const timerBar = document.getElementById('timerBar');
+            
+            timerInterval = setInterval(() => {
+                timerProgress += 100;
+                const percentage = (timerProgress / stepDuration) * 100;
+                timerBar.style.width = percentage + '%';
+                
+                if (timerProgress >= stepDuration) {
+                    timerProgress = 0;
+                }
+            }, 100);
+        }
+
+        function resetTimer() {
+            timerProgress = 0;
+            document.getElementById('timerBar').style.width = '0%';
+            if (isPlaying) {
+                startTimer();
+            }
+        }
+    </script>
+
+</body>
+</html>
