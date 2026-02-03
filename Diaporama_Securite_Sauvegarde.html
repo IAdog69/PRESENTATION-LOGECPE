@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sécurité & Sauvegarde - LOGECPE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #2196F3;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 8px rgba(33, 150, 243, 0.5);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #aaa;
+        }
+
+        .controls-info {
+            margin-top: 15px;
+            padding: 12px 25px;
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            display: inline-block;
+        }
+
+        .animation-container {
+            width: 100%;
+            max-width: 1200px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            min-height: 600px;
+            margin-bottom: 100px;
+        }
+
+        /* Étapes */
+        .step {
+            display: none;
+            opacity: 0;
+        }
+
+        .step.active {
+            display: block;
+            animation: slideInFromRight 0.6s ease forwards;
+        }
+
+        .step.exiting {
+            animation: slideOutToLeft 0.6s ease forwards;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #2196F3, #42A5F5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .step-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #ddd;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOutToLeft {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .step-title {
+            font-size: 2rem;
+            color: #2196F3;
+            font-weight: bold;
+        }
+
+        .feature-box {
+            background: rgba(33, 150, 243, 0.1);
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .feature-box h3 {
+            color: #2196F3;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .highlight-box {
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .highlight-box h3 {
+            color: #2196F3;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .warning-box {
+            background: rgba(255, 152, 0, 0.2);
+            border: 2px solid #FF9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .warning-box h3 {
+            color: #FF9800;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .success-box {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .success-box h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .danger-box {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #F44336;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .danger-box h3 {
+            color: #F44336;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #2196F3;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background: rgba(33, 150, 243, 0.1);
+            border: 2px solid #2196F3;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            background: rgba(33, 150, 243, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .feature-card h3 {
+            color: #2196F3;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #aaa;
+            font-size: 0.95rem;
+        }
+
+        .mockup-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+            transition: transform 0.2s;
+            margin: 10px 5px;
+        }
+
+        .mockup-button:hover {
+            transform: scale(1.05);
+        }
+
+        .mockup-button.warning {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .mockup-button.success {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .mockup-alert {
+            background: #1a1a1a;
+            border: 3px solid #FF9800;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 8px 30px rgba(255, 152, 0, 0.4);
+        }
+
+        .mockup-alert-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #FF9800;
+        }
+
+        .mockup-alert-icon {
+            font-size: 3rem;
+        }
+
+        .mockup-alert-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #FF9800;
+        }
+
+        .mockup-alert-content {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .mockup-alert-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: rgba(33, 150, 243, 0.3);
+            padding: 15px;
+            text-align: left;
+            color: #2196F3;
+            font-weight: bold;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .badge-success {
+            background: rgba(76, 175, 80, 0.3);
+            border: 2px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        .badge-warning {
+            background: rgba(255, 152, 0, 0.3);
+            border: 2px solid #FF9800;
+            color: #FF9800;
+        }
+
+        .badge-danger {
+            background: rgba(244, 67, 54, 0.3);
+            border: 2px solid #F44336;
+            color: #F44336;
+        }
+
+        .badge-info {
+            background: rgba(33, 150, 243, 0.3);
+            border: 2px solid #2196F3;
+            color: #2196F3;
+        }
+
+        .workflow-steps {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .workflow-step {
+            flex: 1;
+            min-width: 150px;
+            background: rgba(33, 150, 243, 0.1);
+            border: 2px solid #2196F3;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .workflow-step-number {
+            background: #2196F3;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-weight: bold;
+        }
+
+        .mockup-screen {
+            background: #1a1a1a;
+            border: 2px solid #2196F3;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .mockup-toolbar {
+            background: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .icon-large {
+            font-size: 4rem;
+            margin: 20px 0;
+            display: block;
+            text-align: center;
+        }
+
+        /* Navigation */
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: rgba(33, 150, 243, 0.15);
+            backdrop-filter: blur(20px);
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: 2px solid rgba(33, 150, 243, 0.3);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2196F3, #42A5F5);
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(33, 150, 243, 0.4);
+        }
+
+        .nav-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(33, 150, 243, 0.6);
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .progress-dot.active {
+            background: #2196F3;
+            transform: scale(1.4);
+            border-color: #2196F3;
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.6);
+        }
+
+        .progress-dot:hover {
+            background: rgba(33, 150, 243, 0.6);
+            transform: scale(1.2);
+        }
+
+        .timer-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2196F3, #42A5F5);
+            width: 0%;
+            transition: width 0.1s linear;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.8);
+        }
+
+        .chrome-logo {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #DB4437 0%, #F4B400 25%, #0F9D58 50%, #4285F4 100%);
+            border-radius: 50%;
+            margin: 0 10px;
+            vertical-align: middle;
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.4);
+        }
+
+        .nextcloud-logo {
+            display: inline-block;
+            padding: 8px 20px;
+            background: #0082C9;
+            color: white;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 0 10px;
+            vertical-align: middle;
+            box-shadow: 0 4px 15px rgba(0, 130, 201, 0.4);
+        }
+
+        .file-icon {
+            font-size: 3rem;
+            margin-right: 15px;
+        }
+
+        .mockup-file-list {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .mockup-file-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: #1a1a1a;
+            border-radius: 6px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .mockup-file-item:hover {
+            background: #252525;
+        }
+
+        .mockup-file-name {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .mockup-file-date {
+            color: #888;
+            margin-left: 20px;
+        }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.05) 100%);
+            border: 2px solid #4CAF50;
+            border-radius: 50px;
+            margin: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .https-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="timer-bar" id="timerBar"></div>
+    
+    <div class="header">
+        <h1>🔒 Sécurité & Sauvegarde</h1>
+        <p>Protégez vos données LOGECPE - Guide complet</p>
+        <div class="controls-info">
+            ⏸️ Auto-play 60s • ▶️ Flèches pour naviguer • 🖊️ Points pour aller à une étape • ⏸️ ESC pour pause
+        </div>
+    </div>
+    
+    <div class="animation-container">
+        <!-- ÉTAPE 1 : Vue d'ensemble -->
+        <div class="step active">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <div class="step-title">🔒 Sécurité & Sauvegarde</div>
+            </div>
+            <div class="step-content">
+                <div class="highlight-box">
+                    <h3 style="color: #2196F3; margin-bottom: 15px;">🛡️ Votre sécurité, notre priorité !</h3>
+                    <p style="font-size: 1.2rem; margin-bottom: 20px;">
+                        LOGECPE intègre un système complet de sécurité et de sauvegarde pour protéger vos données professionnelles.
+                    </p>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">🔐</span>
+                        <h3>Architecture Sécurisée</h3>
+                        <p>Connexion HTTPS, boucle fermée, aucune transmission Internet</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">💾</span>
+                        <h3>Sauvegarde Locale</h3>
+                        <p>Contrôle total sur vos données, sauvegarde dans le dossier de votre choix</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">☁️</span>
+                        <h3>Nextcloud Education</h3>
+                        <p>Accès multi-terminal, synchronisation sécurisée, recommandé</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">⚠️</span>
+                        <h3>Protection Anti-Écrasement</h3>
+                        <p>Alertes automatiques, blocage intelligent, sécurité renforcée</p>
+                    </div>
+                </div>
+
+                <div class="warning-box" style="margin-top: 30px;">
+                    <h3 style="color: #FF9800; margin-bottom: 10px;">⚡ Point clé :</h3>
+                    <p style="font-size: 1.1rem;">
+                        La sauvegarde régulière de vos données est <strong>ESSENTIELLE</strong> pour garantir la continuité de votre travail CPE.
+                        Suivez ce diaporama pour maîtriser tous les aspects de la sécurité et de la sauvegarde.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 2 : Architecture sécurisée -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <div class="step-title">🔐 Architecture Sécurisée</div>
+            </div>
+            <div class="step-content">
+                <div class="success-box">
+                    <h3 style="color: #4CAF50; margin-bottom: 15px;">✓ Connexion HTTPS Sécurisée</h3>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div class="https-badge">
+                            <span style="font-size: 1.5rem;">🔒</span>
+                            <span>https://logecpe.example.fr</span>
+                        </div>
+                    </div>
+                    <p style="font-size: 1.1rem;">
+                        L'accès à LOGECPE se fait exclusivement via protocole HTTPS, garantissant le chiffrement de toutes les communications.
+                    </p>
+                </div>
+
+                <div class="highlight-box">
+                    <h3 style="color: #2196F3; margin-bottom: 15px;">🔄 Boucle Fermée - Aucune Transmission Internet</h3>
+                    <div class="workflow-steps">
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">1</div>
+                            <strong>Navigateur</strong><br>
+                            <small>Votre ordinateur</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">2</div>
+                            <strong>Serveur Local</strong><br>
+                            <small>Établissement</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">3</div>
+                            <strong>Base de données</strong><br>
+                            <small>Locale uniquement</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="danger-box">
+                    <h3 style="color: #F44336; margin-bottom: 15px;">🚫 Ce qui NE SE PASSE PAS :</h3>
+                    <ul class="feature-list">
+                        <li style="color: #F44336;">Aucune donnée élève transmise sur Internet</li>
+                        <li style="color: #F44336;">Aucun stockage sur serveur externe</li>
+                        <li style="color: #F44336;">Aucun partage avec des tiers</li>
+                        <li style="color: #F44336;">Aucune fuite de données possible</li>
+                    </ul>
+                </div>
+
+                <div class="security-badge">
+                    <span style="font-size: 2rem;">✓</span>
+                    <span>Conformité RGPD garantie</span>
+                </div>
+                <div class="security-badge">
+                    <span style="font-size: 2rem;">✓</span>
+                    <span>Données 100% en local</span>
+                </div>
+                <div class="security-badge">
+                    <span style="font-size: 2rem;">✓</span>
+                    <span>Contrôle total établissement</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3 : Navigateur Chrome recommandé -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <div class="step-title">🌐 Navigateur Chrome</div>
+            </div>
+            <div class="step-content">
+                <div class="highlight-box">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <span class="chrome-logo"></span>
+                        <h3 style="color: #4285F4; display: inline-block; vertical-align: middle; margin-left: 20px;">
+                            Google Chrome - Fortement Recommandé
+                        </h3>
+                    </div>
+                    <p style="font-size: 1.2rem; text-align: center; color: #4285F4; font-weight: bold;">
+                        ⚠️ Pour une expérience optimale et un contrôle total sur vos sauvegardes
+                    </p>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">📁</span>
+                        <h3>Choix du dossier de sauvegarde</h3>
+                        <p>Chrome vous permet de choisir <strong>exactement</strong> où sauvegarder vos fichiers (USB, Nextcloud, réseau...)</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">⚡</span>
+                        <h3>Performances optimales</h3>
+                        <p>Navigation fluide, chargement rapide, compatibilité totale avec LOGECPE</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">🔄</span>
+                        <h3>Mises à jour automatiques</h3>
+                        <p>Toujours la dernière version, sécurité renforcée, nouvelles fonctionnalités</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">🛡️</span>
+                        <h3>Sécurité avancée</h3>
+                        <p>Protection anti-malware, navigation sécurisée, certificats HTTPS validés</p>
+                    </div>
+                </div>
+
+                <div class="warning-box" style="margin-top: 30px;">
+                    <h3 style="color: #FF9800; margin-bottom: 15px;">💡 Configuration Chrome pour LOGECPE :</h3>
+                    <ol style="padding-left: 20px; font-size: 1.1rem;">
+                        <li style="margin: 10px 0;">Ouvrir Chrome → Paramètres → Téléchargements</li>
+                        <li style="margin: 10px 0;">Activer : <strong>"Demander où enregistrer chaque fichier avant le téléchargement"</strong></li>
+                        <li style="margin: 10px 0;">À chaque sauvegarde LOGECPE, vous choisissez le dossier !</li>
+                    </ol>
+                </div>
+
+                <div class="success-box">
+                    <p style="font-size: 1.15rem; text-align: center;">
+                        ✓ Avec Chrome, vous gardez le <strong>contrôle total</strong> sur l'emplacement de vos sauvegardes !
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 4 : Sauvegarde locale -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <div class="step-title">💾 Sauvegarde Locale</div>
+            </div>
+            <div class="step-content">
+                <div class="warning-box">
+                    <h3 style="color: #FF9800; margin-bottom: 15px;">⚠️ Importance CRITIQUE de la sauvegarde locale :</h3>
+                    <p style="font-size: 1.2rem;">
+                        Vos données LOGECPE sont stockées dans le navigateur. Une sauvegarde régulière est <strong>INDISPENSABLE</strong> 
+                        pour éviter toute perte de données (mise à jour navigateur, changement d'ordinateur, crash système...).
+                    </p>
+                </div>
+
+                <div class="highlight-box">
+                    <h3 style="color: #2196F3; margin-bottom: 20px;">📍 Où sauvegarder ? (Plusieurs options)</h3>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Support</th>
+                                <th>Avantages</th>
+                                <th>Recommandation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>💾 Disque dur local</strong></td>
+                                <td>Rapide, accessible hors ligne</td>
+                                <td><span class="badge badge-warning">Minimum requis</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>☁️ Nextcloud Education</strong></td>
+                                <td>Multi-terminal, synchronisé, sauvegarde automatique</td>
+                                <td><span class="badge badge-success">Fortement recommandé</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>🔌 Clé USB</strong></td>
+                                <td>Portable, indépendant du réseau</td>
+                                <td><span class="badge badge-info">Sauvegarde d'appoint</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>🌐 Lecteur réseau</strong></td>
+                                <td>Centralisé, accessible depuis l'établissement</td>
+                                <td><span class="badge badge-info">Selon infrastructure</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="success-box">
+                    <h3 style="color: #4CAF50; margin-bottom: 15px;">✓ Meilleure pratique recommandée :</h3>
+                    <div style="font-size: 1.15rem; line-height: 2;">
+                        <p><strong>1.</strong> Sauvegarde principale → <span class="nextcloud-logo">☁️ Nextcloud Education</span></p>
+                        <p><strong>2.</strong> Sauvegarde secondaire → 💾 Disque dur local</p>
+                        <p><strong>3.</strong> Sauvegarde d'urgence → 🔌 Clé USB (hebdomadaire)</p>
+                    </div>
+                </div>
+
+                <div class="danger-box">
+                    <p style="font-size: 1.1rem; text-align: center;">
+                        <strong>🚨 Ne JAMAIS avoir qu'une seule copie de vos données !</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 5 : Bouton "Sauvegarder USB/Cloud" -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">5</div>
+                <div class="step-title">💾 Bouton USB/Cloud</div>
+            </div>
+            <div class="step-content">
+                <div class="highlight-box">
+                    <h3 style="color: #2196F3; margin-bottom: 20px;">📍 Localisation du bouton</h3>
+                    <div class="mockup-screen">
+                        <div class="mockup-toolbar">
+                            <button class="mockup-button">🏠 Accueil</button>
+                            <button class="mockup-button">📊 Statistiques</button>
+                            <button class="mockup-button">📅 Agenda</button>
+                            <button class="mockup-button">👥 Classes</button>
+                            <button class="mockup-button" style="margin-left: auto; background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%); box-shadow: 0 4px 20px rgba(76, 175, 80, 0.5);">
+                                💾 Sauvegarder USB/Cloud
+                            </button>
+                        </div>
+                        <p style="text-align: center; color: #888; margin-top: 10px;">
+                            ↑ Bouton situé dans la barre d'outils principale, toujours accessible
+                        </p>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <h3 style="color: #4CAF50; margin-bottom: 15px;">✓ Fonctionnement du bouton :</h3>
+                    <div class="workflow-steps">
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">1</div>
+                            <strong>Clic sur le bouton</strong><br>
+                            <small>Action immédiate</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">2</div>
+                            <strong>Génération fichier</strong><br>
+                            <small>LOGECPE_sauvegarde.json</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">3</div>
+                            <strong>Choix dossier</strong><br>
+                            <small>Chrome vous demande</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">4</div>
+                            <strong>Enregistrement</strong><br>
+                            <small>Fichier sauvegardé</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3 style="color: #2196F3; margin-bottom: 15px;">📦 Contenu du fichier de sauvegarde :</h3>
+                    <ul class="feature-list">
+                        <li>Toutes les données élèves (fiches complètes)</li>
+                        <li>Historique des incidents et événements</li>
+                        <li>Configuration des classes et divisions</li>
+                        <li>Rendez-vous et plannings</li>
+                        <li>Statistiques et données agrégées</li>
+                        <li>Paramètres personnels et préférences</li>
+                    </ul>
+                </div>
+
+                <div class="mockup-file-list">
+                    <div class="mockup-file-item">
+                        <span class="file-icon">📄</span>
+                        <span class="mockup-file-name">LOGECPE_sauvegarde_2026-02-01_14h30.json</span>
+                        <span class="mockup-file-date">Aujourd'hui 14:30</span>
+                    </div>
+                    <div class="mockup-file-item">
+                        <span class="file-icon">📄</span>
+                        <span class="mockup-file-name">LOGECPE_sauvegarde_2026-01-31_16h45.json</span>
+                        <span class="mockup-file-date">Hier 16:45</span>
+                    </div>
+                    <div class="mockup-file-item">
+                        <span class="file-icon">📄</span>
+                        <span class="mockup-file-name">LOGECPE_sauvegarde_2026-01-29_09h15.json</span>
+                        <span class="mockup-file-date">29 jan. 09:15</span>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <p style="font-size: 1.1rem; text-align: center;">
+                        💡 <strong>Astuce :</strong> Le nom du fichier inclut automatiquement la date et l'heure pour faciliter le suivi des versions.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 6 : Protection anti-écrasement -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">6</div>
+                <div class="step-title">⚠️ Protection Anti-Écrasement</div>
+            </div>
+            <div class="step-content">
+                <div class="danger-box">
+                    <h3 style="color: #F44336; margin-bottom: 15px;">🛡️ Mécanisme de sécurité intégré</h3>
+                    <p style="font-size: 1.2rem;">
+                        LOGECPE détecte automatiquement si un fichier de sauvegarde existe déjà avec le même nom 
+                        et <strong>bloque l'écrasement accidentel</strong> pour protéger vos données.
+                    </p>
+                </div>
+
+                <div class="highlight-box">
+                    <h3 style="color: #2196F3; margin-bottom: 20px;">🔍 Scénario de protection :</h3>
+                    
+                    <div class="mockup-alert">
+                        <div class="mockup-alert-header">
+                            <span class="mockup-alert-icon">⚠️</span>
+                            <span class="mockup-alert-title">Fichier de sauvegarde existant détecté</span>
+                        </div>
+                        <div class="mockup-alert-content">
+                            <p style="margin-bottom: 15px;">
+                                <strong>Un fichier de sauvegarde existe déjà :</strong><br>
+                                <code style="background: #333; padding: 5px 10px; border-radius: 4px; color: #4CAF50;">
+                                    LOGECPE_sauvegarde_2026-02-01_14h30.json
+                                </code>
+                            </p>
+                            <p style="margin-bottom: 15px;">
+                                <strong>Date de la sauvegarde existante :</strong> Aujourd'hui à 14:30<br>
+                                <strong>Taille du fichier :</strong> 2.4 Mo
+                            </p>
+                            <p style="color: #FF9800; font-weight: bold;">
+                                ⚠️ Écraser ce fichier entraînera la perte définitive de la sauvegarde précédente !
+                            </p>
+                        </div>
+                        <div class="mockup-alert-buttons">
+                            <button class="mockup-button" style="background: #666;">❌ Annuler</button>
+                            <button class="mockup-button warning">📝 Renommer la nouvelle</button>
+                            <button class="mockup-button" style="background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);">⚠️ Écraser quand même</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <h3 style="color: #4CAF50; margin-bottom: 15px;">✓ Options recommandées :</h3>
+                    <ul class="feature-list">
+                        <li><strong>Renommer la nouvelle :</strong> Ajouter un suffixe (ex: "_v2", "_final", "_backup")</li>
+                        <li><strong>Choisir un autre dossier :</strong> Séparer par date ou par site</li>
+                        <li><strong>Annuler et vérifier :</strong> Comparer les dates avant de décider</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h3 style="color: #FF9800; margin-bottom: 15px;">🔒 Blocages intelligents :</h3>
+                    <p style="font-size: 1.1rem; margin-bottom: 15px;">
+                        <strong>1. Délai court (moins de 5 minutes) :</strong><br>
+                        Si vous tentez de sauvegarder dans le <strong>même dossier</strong> avec le <strong>même nom</strong> 
+                        dans un <strong>délai court</strong> (moins de 5 minutes), LOGECPE affichera une confirmation supplémentaire 
+                        pour éviter les fausses manipulations.
+                    </p>
+                    <p style="font-size: 1.1rem;">
+                        <strong>2. Base vide sur base existante :</strong><br>
+                        Si vous tentez de sauvegarder une <strong>base vide</strong> (aucune donnée élève) sur une 
+                        <strong>base existante contenant des données</strong>, LOGECPE bloque l'opération et affiche un message 
+                        d'erreur pour éviter la perte accidentelle de toutes vos données.
+                    </p>
+                </div>
+
+                <div class="danger-box">
+                    <h3 style="color: #F44336; margin-bottom: 15px;">🚫 Exemple de blocage base vide :</h3>
+                    <div class="mockup-alert" style="border-color: #F44336;">
+                        <div class="mockup-alert-header" style="border-color: #F44336;">
+                            <span class="mockup-alert-icon">🚫</span>
+                            <span class="mockup-alert-title" style="color: #F44336;">Sauvegarde bloquée - Base vide détectée</span>
+                        </div>
+                        <div class="mockup-alert-content">
+                            <p style="margin-bottom: 15px; color: #F44336; font-weight: bold;">
+                                ⚠️ ATTENTION : Vous tentez de sauvegarder une base vide !
+                            </p>
+                            <p style="margin-bottom: 15px;">
+                                <strong>Base actuelle :</strong> Aucune donnée élève (0 fiche)<br>
+                                <strong>Fichier cible :</strong> LOGECPE_sauvegarde_2026-01-31.json (342 fiches)<br>
+                                <strong>Taille du fichier existant :</strong> 2.4 Mo
+                            </p>
+                            <p style="color: #F44336; font-weight: bold;">
+                                🚨 Cette opération écraserait toutes vos données existantes avec une base vide !<br>
+                                Opération BLOQUÉE pour votre sécurité.
+                            </p>
+                        </div>
+                        <div class="mockup-alert-buttons">
+                            <button class="mockup-button" style="background: #2196F3;">✓ OK, compris</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <div class="security-badge">
+                        <span style="font-size: 2rem;">🛡️</span>
+                        <span>Vos données sont protégées contre les suppressions accidentelles</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 7 : Nextcloud Education -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">7</div>
+                <div class="step-title">☁️ Nextcloud Education</div>
+            </div>
+            <div class="step-content">
+                <div class="success-box" style="text-align: center;">
+                    <h2 style="color: #0082C9; margin-bottom: 15px;">
+                        <span class="nextcloud-logo" style="font-size: 1.5rem; padding: 12px 30px;">☁️ Nextcloud Education</span>
+                    </h2>
+                    <p style="font-size: 1.3rem; font-weight: bold; color: #4CAF50;">
+                        🏆 Solution FORTEMENT RECOMMANDÉE pour LOGECPE
+                    </p>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">🌐</span>
+                        <h3>Accès Multi-Terminal</h3>
+                        <p>Accédez à vos sauvegardes depuis <strong>n'importe quel ordinateur</strong> de l'établissement</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">🔄</span>
+                        <h3>Synchronisation Automatique</h3>
+                        <p>Vos fichiers sont synchronisés en temps réel sur tous vos appareils</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">🔐</span>
+                        <h3>Sécurité Éducation Nationale</h3>
+                        <p>Hébergement conforme RGPD, chiffrement, conformité réglementaire</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">📦</span>
+                        <h3>Espace de Stockage Généreux</h3>
+                        <p>Conservez toutes vos sauvegardes sans limite de versions</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <h3 style="color: #2196F3; margin-bottom: 15px;">🎯 Pourquoi Nextcloud pour LOGECPE ?</h3>
+                    <ul class="feature-list">
+                        <li><strong>Mobilité :</strong> Changez d'ordinateur sans perdre vos données</li>
+                        <li><strong>Continuité :</strong> Sauvegarde automatique dès que vous enregistrez</li>
+                        <li><strong>Historique :</strong> Nextcloud conserve les versions précédentes (récupération possible)</li>
+                        <li><strong>Partage :</strong> Collaborez avec d'autres CPE (si autorisé)</li>
+                        <li><strong>Sécurité :</strong> Hébergé par l'Éducation Nationale, données en France</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h3 style="color: #FF9800; margin-bottom: 15px;">⚙️ Configuration Nextcloud + Chrome :</h3>
+                    <div class="workflow-steps">
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">1</div>
+                            <strong>Installer Nextcloud</strong><br>
+                            <small>Client desktop</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">2</div>
+                            <strong>Choisir dossier sync</strong><br>
+                            <small>Ex: C:\Nextcloud\</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">3</div>
+                            <strong>Configurer Chrome</strong><br>
+                            <small>Téléchargements → Nextcloud</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">4</div>
+                            <strong>Sauvegarder</strong><br>
+                            <small>Auto-sync !</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <p style="font-size: 1.2rem; text-align: center;">
+                        ✓ Avec Nextcloud, sauvegardez une fois, accédez partout !
+                    </p>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <div class="security-badge">
+                        <span style="font-size: 2rem;">☁️</span>
+                        <span>Nextcloud Education = Sérénité garantie</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 8 : Import/Restauration -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">8</div>
+                <div class="step-title">📥 Import & Restauration</div>
+            </div>
+            <div class="step-content">
+                <div class="highlight-box">
+                    <h3 style="color: #2196F3; margin-bottom: 20px;">🔄 Restaurer vos données LOGECPE</h3>
+                    <p style="font-size: 1.1rem; margin-bottom: 20px;">
+                        Que vous changiez d'ordinateur ou que vous deviez restaurer une sauvegarde, 
+                        le processus d'import est simple et sécurisé.
+                    </p>
+                </div>
+
+                <div class="success-box">
+                    <h3 style="color: #4CAF50; margin-bottom: 20px;">✓ Procédure de restauration :</h3>
+                    <div class="workflow-steps">
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">1</div>
+                            <strong>Bouton Import</strong><br>
+                            <small>Barre d'outils</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">2</div>
+                            <strong>Sélectionner fichier</strong><br>
+                            <small>.json sauvegarde</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">3</div>
+                            <strong>Vérification</strong><br>
+                            <small>Aperçu contenu</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">4</div>
+                            <strong>Confirmation</strong><br>
+                            <small>Import validé</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">5</div>
+                            <strong>Données restaurées</strong><br>
+                            <small>Prêt à travailler</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mockup-screen">
+                    <h4 style="color: #2196F3; margin-bottom: 15px;">📊 Aperçu avant import :</h4>
+                    <div style="background: #2d2d2d; padding: 20px; border-radius: 8px;">
+                        <p><strong>Fichier :</strong> LOGECPE_sauvegarde_2026-02-01_14h30.json</p>
+                        <p><strong>Date de sauvegarde :</strong> 01/02/2026 à 14:30</p>
+                        <p><strong>Taille :</strong> 2.4 Mo</p>
+                        <hr style="border-color: #444; margin: 15px 0;">
+                        <p><strong>Contenu détecté :</strong></p>
+                        <ul style="padding-left: 20px; margin-top: 10px;">
+                            <li>✓ 342 fiches élèves</li>
+                            <li>✓ 1,247 événements historiques</li>
+                            <li>✓ 12 classes configurées</li>
+                            <li>✓ 28 rendez-vous planifiés</li>
+                            <li>✓ Statistiques et paramètres</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <h3 style="color: #FF9800; margin-bottom: 15px;">⚠️ Attention lors de l'import :</h3>
+                    <ul class="feature-list">
+                        <li><strong>Données actuelles remplacées :</strong> L'import écrase les données présentes dans le navigateur</li>
+                        <li><strong>Sauvegardez d'abord :</strong> Si vous avez des données importantes, sauvegardez-les avant d'importer</li>
+                        <li><strong>Vérifiez la date :</strong> Assurez-vous d'importer la bonne version</li>
+                        <li><strong>Fichier corrompu :</strong> LOGECPE refuse les fichiers invalides</li>
+                    </ul>
+                </div>
+
+                <div class="danger-box">
+                    <h3 style="color: #F44336; margin-bottom: 15px;">🚨 Cas particuliers :</h3>
+                    <p style="font-size: 1.1rem;">
+                        <strong>Changement d'ordinateur :</strong> Importez votre sauvegarde Nextcloud dès la première connexion.<br><br>
+                        <strong>Réinitialisation navigateur :</strong> Pensez à réimporter votre dernière sauvegarde.<br><br>
+                        <strong>Transfert vers collègue :</strong> Utilisez l'import pour partager une base commune (avec autorisation).
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 9 : Bonnes pratiques -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">9</div>
+                <div class="step-title">📋 Bonnes Pratiques</div>
+            </div>
+            <div class="step-content">
+                <div class="success-box">
+                    <h3 style="color: #4CAF50; margin-bottom: 20px;">✓ Règles d'or de la sauvegarde LOGECPE :</h3>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Fréquence</th>
+                                <th>Action</th>
+                                <th>Support</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Quotidien</strong></td>
+                                <td>Sauvegarde en fin de journée</td>
+                                <td><span class="badge badge-success">Nextcloud</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hebdomadaire</strong></td>
+                                <td>Sauvegarde de sécurité</td>
+                                <td><span class="badge badge-info">USB / Disque local</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Avant grande saisie</strong></td>
+                                <td>Sauvegarde préventive</td>
+                                <td><span class="badge badge-warning">Tous supports</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Avant mise à jour</strong></td>
+                                <td>Sauvegarde de précaution</td>
+                                <td><span class="badge badge-warning">Tous supports</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fin de période</strong></td>
+                                <td>Archive trimestrielle</td>
+                                <td><span class="badge badge-info">USB + Nextcloud</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="highlight-box">
+                    <h3 style="color: #2196F3; margin-bottom: 15px;">📝 Nomenclature recommandée :</h3>
+                    <div class="mockup-file-list">
+                        <div class="mockup-file-item">
+                            <span class="file-icon">📄</span>
+                            <span class="mockup-file-name">LOGECPE_2026_T2_Fevrier01.json</span>
+                            <span class="badge badge-success">Quotidien</span>
+                        </div>
+                        <div class="mockup-file-item">
+                            <span class="file-icon">📄</span>
+                            <span class="mockup-file-name">LOGECPE_2026_Semaine05_backup.json</span>
+                            <span class="badge badge-info">Hebdomadaire</span>
+                        </div>
+                        <div class="mockup-file-item">
+                            <span class="file-icon">📄</span>
+                            <span class="mockup-file-name">LOGECPE_2026_T1_ARCHIVE.json</span>
+                            <span class="badge badge-warning">Archive</span>
+                        </div>
+                    </div>
+                    <p style="margin-top: 15px; font-size: 1.05rem;">
+                        💡 <strong>Astuce :</strong> Organisez vos sauvegardes par dossiers (année, trimestre) pour faciliter la gestion.
+                    </p>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">✅</span>
+                        <h3>À FAIRE</h3>
+                        <ul style="text-align: left; padding-left: 20px;">
+                            <li>Sauvegarder régulièrement</li>
+                            <li>Vérifier les sauvegardes</li>
+                            <li>Utiliser plusieurs supports</li>
+                            <li>Nommer clairement les fichiers</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card" style="border-color: #F44336; background: rgba(244, 67, 54, 0.1);">
+                        <span class="feature-icon">❌</span>
+                        <h3>À ÉVITER</h3>
+                        <ul style="text-align: left; padding-left: 20px;">
+                            <li>Attendre plusieurs semaines</li>
+                            <li>Une seule copie unique</li>
+                            <li>Écraser les anciennes versions</li>
+                            <li>Ignorer les alertes système</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <h3 style="color: #FF9800; margin-bottom: 10px;">🔍 Vérification post-sauvegarde :</h3>
+                    <ol style="padding-left: 20px; font-size: 1.05rem;">
+                        <li>Vérifiez que le fichier .json a bien été créé</li>
+                        <li>Contrôlez la taille du fichier (devrait être > 1 Mo si vous avez des données)</li>
+                        <li>Testez l'import sur un autre navigateur (optionnel)</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 10 : Scénarios courants -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">10</div>
+                <div class="step-title">🎬 Scénarios Courants</div>
+            </div>
+            <div class="step-content">
+                <div class="highlight-box">
+                    <h3 style="color: #2196F3; margin-bottom: 20px;">📌 Scénario 1 : Changement d'ordinateur</h3>
+                    <div class="workflow-steps">
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">1</div>
+                            <strong>Ancien PC</strong><br>
+                            <small>Sauvegarder sur Nextcloud</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">2</div>
+                            <strong>Nouveau PC</strong><br>
+                            <small>Installer Chrome</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">3</div>
+                            <strong>Configurer Nextcloud</strong><br>
+                            <small>Synchronisation auto</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">4</div>
+                            <strong>Ouvrir LOGECPE</strong><br>
+                            <small>Importer sauvegarde</small>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="workflow-step-number">5</div>
+                            <strong>Reprendre travail</strong><br>
+                            <small>Tout est là !</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="success-box">
+                    <h3 style="color: #4CAF50; margin-bottom: 20px;">📌 Scénario 2 : Travail multi-sites</h3>
+                    <p style="font-size: 1.1rem; margin-bottom: 15px;">
+                        Vous travaillez sur plusieurs établissements avec plusieurs ordinateurs ?
+                    </p>
+                    <ul class="feature-list">
+                        <li><strong>Solution :</strong> Nextcloud Education devient indispensable</li>
+                        <li><strong>Avantage :</strong> Même sauvegarde accessible partout</li>
+                        <li><strong>Pratique :</strong> Sauvegardez sur site A, importez sur site B</li>
+                        <li><strong>Sécurité :</strong> Synchronisation automatique entre tous vos postes</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <h3 style="color: #FF9800; margin-bottom: 20px;">📌 Scénario 3 : Crash système / Réinitialisation</h3>
+                    <div style="background: #2d2d2d; padding: 20px; border-radius: 8px; margin-top: 15px;">
+                        <p style="font-size: 1.1rem; margin-bottom: 15px;">
+                            <strong>Problème :</strong> Votre ordinateur a planté, Chrome a été réinstallé, les données LOGECPE ont disparu.
+                        </p>
+                        <p style="font-size: 1.1rem; color: #4CAF50; font-weight: bold;">
+                            ✓ <strong>Solution :</strong> Récupération depuis Nextcloud ou USB
+                        </p>
+                        <ol style="padding-left: 20px; margin-top: 15px; font-size: 1.05rem;">
+                            <li>Réinstaller Chrome</li>
+                            <li>Accéder à Nextcloud ou brancher la clé USB</li>
+                            <li>Ouvrir LOGECPE → Bouton "Import"</li>
+                            <li>Sélectionner la dernière sauvegarde</li>
+                            <li>Valider l'import → Données restaurées !</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="danger-box">
+                    <h3 style="color: #F44336; margin-bottom: 15px;">📌 Scénario 4 : Partage avec collègue CPE</h3>
+                    <p style="font-size: 1.1rem; margin-bottom: 15px;">
+                        <strong>Situation :</strong> Vous souhaitez partager votre base LOGECPE avec un collègue (remplacement, continuité...).
+                    </p>
+                    <p style="font-size: 1.1rem;">
+                        <strong>Procédure sécurisée :</strong>
+                    </p>
+                    <ol style="padding-left: 20px; margin-top: 10px; font-size: 1.05rem;">
+                        <li>Sauvegarder vos données (fichier .json)</li>
+                        <li>Partager le fichier via Nextcloud (partage sécurisé)</li>
+                        <li>Le collègue importe le fichier dans son LOGECPE</li>
+                        <li>⚠️ Attention : Respect du RGPD et autorisation nécessaire</li>
+                    </ol>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <div class="security-badge">
+                        <span style="font-size: 2rem;">💡</span>
+                        <span>Anticipez les problèmes, sauvegardez régulièrement !</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 11 : Récapitulatif -->
+        <div class="step">
+            <div class="step-header">
+                <div class="step-number">11</div>
+                <div class="step-title">📊 Récapitulatif</div>
+            </div>
+            <div class="step-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">🔐</span>
+                        <h3>Architecture Sécurisée</h3>
+                        <p>HTTPS, boucle fermée, aucune transmission Internet, conformité RGPD</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">🌐</span>
+                        <h3>Chrome Recommandé</h3>
+                        <p>Choix du dossier de sauvegarde, performances optimales, sécurité avancée</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">💾</span>
+                        <h3>Sauvegarde Locale</h3>
+                        <p>Bouton USB/Cloud, protection anti-écrasement, nomenclature horodatée</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">☁️</span>
+                        <h3>Nextcloud Education</h3>
+                        <p>Multi-terminal, synchronisation auto, fortement recommandé</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">⚠️</span>
+                        <h3>Protection Anti-Écrasement</h3>
+                        <p>Alertes automatiques, confirmation requise, blocage intelligent</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">📥</span>
+                        <h3>Import & Restauration</h3>
+                        <p>Procédure simple, aperçu du contenu, validation sécurisée</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">📋</span>
+                        <h3>Bonnes Pratiques</h3>
+                        <p>Quotidien + Hebdo, plusieurs supports, vérification systématique</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <span class="feature-icon">🎬</span>
+                        <h3>Scénarios Courants</h3>
+                        <p>Changement PC, multi-sites, crash système, partage collègue</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <h3 style="color: #2196F3; margin-bottom: 20px; text-align: center;">✅ Checklist Sécurité LOGECPE</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <ul class="feature-list">
+                                <li>Chrome installé et configuré</li>
+                                <li>Nextcloud Education activé</li>
+                                <li>Sauvegarde quotidienne planifiée</li>
+                                <li>Sauvegarde USB hebdomadaire</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <ul class="feature-list">
+                                <li>Nomenclature claire adoptée</li>
+                                <li>Dossiers organisés par période</li>
+                                <li>Vérification des sauvegardes</li>
+                                <li>Test d'import réalisé</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="success-box" style="margin-top: 20px;">
+                    <h3 style="color: #4CAF50; margin-bottom: 15px; text-align: center;">🏆 Configuration Idéale</h3>
+                    <div style="font-size: 1.2rem; text-align: center; line-height: 2;">
+                        <p><strong>1.</strong> <span class="chrome-logo" style="width: 40px; height: 40px;"></span> Chrome comme navigateur principal</p>
+                        <p><strong>2.</strong> <span class="nextcloud-logo">☁️ Nextcloud</span> pour la sauvegarde automatique</p>
+                        <p><strong>3.</strong> 🔌 USB pour les sauvegardes hebdomadaires</p>
+                        <p><strong>4.</strong> 💾 Bouton "Sauvegarder USB/Cloud" utilisé quotidiennement</p>
+                    </div>
+                </div>
+
+                <div class="danger-box" style="margin-top: 20px;">
+                    <h3 style="color: #F44336; text-align: center; font-size: 1.3rem;">
+                        🚨 NE PERDEZ JAMAIS VOS DONNÉES CPE !
+                    </h3>
+                    <p style="text-align: center; font-size: 1.15rem; margin-top: 15px;">
+                        Une sauvegarde régulière = Tranquillité d'esprit garantie
+                    </p>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <div class="security-badge">
+                        <span style="font-size: 2.5rem;">🛡️</span>
+                        <span>Vos données LOGECPE sont en sécurité !</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-button" onclick="prevStep()">◄</button>
+        <div class="progress-dots" id="progressDots"></div>
+        <button class="nav-button" onclick="nextStep()">►</button>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const steps = document.querySelectorAll('.step');
+        const totalSteps = steps.length;
+        let autoPlayTimer = null;
+        let timerInterval = null;
+
+        // Initialiser les points de progression
+        function initProgressDots() {
+            const dotsContainer = document.getElementById('progressDots');
+            for (let i = 0; i < totalSteps; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot';
+                if (i === 0) dot.classList.add('active');
+                dot.onclick = () => goToStep(i);
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        // Afficher une étape spécifique
+        function showStep(index) {
+            steps.forEach((step, i) => {
+                step.classList.remove('active');
+                if (i === index) {
+                    step.classList.add('active');
+                }
+            });
+
+            // Mettre à jour les dots
+            const dots = document.querySelectorAll('.progress-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.remove('active');
+                if (i === index) {
+                    dot.classList.add('active');
+                }
+            });
+
+            currentStep = index;
+        }
+
+        // Navigation
+        function nextStep() {
+            if (currentStep < totalSteps - 1) {
+                showStep(currentStep + 1);
+                resetAutoPlay();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                showStep(currentStep - 1);
+                resetAutoPlay();
+            }
+        }
+
+        function goToStep(index) {
+            showStep(index);
+            resetAutoPlay();
+        }
+
+        // Auto-play
+        function startAutoPlay() {
+            const duration = 60000; // 60 secondes
+            const timerBar = document.getElementById('timerBar');
+            let startTime = Date.now();
+
+            timerInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const progress = (elapsed / duration) * 100;
+                timerBar.style.width = progress + '%';
+
+                if (elapsed >= duration) {
+                    clearInterval(timerInterval);
+                    timerBar.style.width = '0%';
+                }
+            }, 100);
+
+            autoPlayTimer = setTimeout(() => {
+                if (currentStep < totalSteps - 1) {
+                    nextStep();
+                    startAutoPlay();
+                }
+            }, duration);
+        }
+
+        function resetAutoPlay() {
+            if (autoPlayTimer) {
+                clearTimeout(autoPlayTimer);
+                clearInterval(timerInterval);
+                document.getElementById('timerBar').style.width = '0%';
+            }
+            startAutoPlay();
+        }
+
+        // Gestion du clic droit
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            nextStep();
+        });
+
+        // Gestion du clavier
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextStep();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevStep();
+            } else if (e.key === 'Escape') {
+                if (autoPlayTimer) {
+                    clearTimeout(autoPlayTimer);
+                    clearInterval(timerInterval);
+                    document.getElementById('timerBar').style.width = '0%';
+                    autoPlayTimer = null;
+                }
+            }
+        });
+
+        // Initialisation
+        initProgressDots();
+        startAutoPlay();
+    </script>
+</body>
+</html>
